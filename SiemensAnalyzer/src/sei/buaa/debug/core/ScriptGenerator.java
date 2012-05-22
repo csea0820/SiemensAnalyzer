@@ -1,9 +1,14 @@
+package sei.buaa.debug.core;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import sei.buaa.debug.utility.Constant;
+import sei.buaa.debug.utility.FileUtility;
+import sei.buaa.debug.utility.StringUtility;
 
 public class ScriptGenerator {
 
@@ -141,7 +146,7 @@ public class ScriptGenerator {
 		sb.append("\trm $programName.exe\n");
 	}
 
-	public void testCaseGen(String testPlanPath) {
+	private void testCaseGen(String testPlanPath) {
 		BufferedReader bufferReader = null;
 		String str = null;
 		String testCase = null;
@@ -185,7 +190,7 @@ public class ScriptGenerator {
 		sb.append("\t\trm $programName.gcda\n\n");
 	}
 
-	protected String convert(String s) {
+	private String convert(String s) {
 		if (s == null)
 			return s;
 		if (s.startsWith(".."))

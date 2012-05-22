@@ -1,3 +1,4 @@
+package sei.buaa.debug.utility;
 
 public class Constant {
 	
