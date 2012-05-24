@@ -58,5 +58,9 @@ public class TestCase {
 		
 		return sb.toString();
 	}
+
+	public List<Statement> getStatements() {
+		return statements;
+	}
 	
 }

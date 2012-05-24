@@ -29,7 +29,7 @@ public class Parser {
 			}
 		}
 		else{
-			System.err.println(gcovDir+"is not a directory!");
+			System.err.println(gcovDir+" is not a directory!");
 		}
 		
 		return ret;
@@ -82,7 +82,7 @@ public class Parser {
 			e.printStackTrace();
 		}finally
 		{
-			System.out.println(tc);
+			//System.out.println(tc);
 			try {
 				fr.close();
 				br.close();
