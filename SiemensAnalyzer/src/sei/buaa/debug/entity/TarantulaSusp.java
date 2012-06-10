@@ -6,6 +6,12 @@ public class TarantulaSusp extends Suspiciousness {
 		super(ln);
 	}
 	
+	/*
+	 * a00:test case that don't execute the statement passes
+	 * a01:test case that don't execute the statement fails
+	 * a10:test case that execute the statement passes
+	 * a11:test case that execute the statement fails
+	 */
 	public void calcSups(int a00,int a01,int a10,int a11)
 	{
 		double res = (a10*1.0/a11)*((a11+a01)*1.0/(a10+a00));

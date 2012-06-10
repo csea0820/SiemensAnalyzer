@@ -1,11 +1,16 @@
 package sei.buaa.debug.core;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sei.buaa.debug.entity.Expensive;
 import sei.buaa.debug.entity.JaccardSusp;
 import sei.buaa.debug.entity.OchiaiSusp;
 import sei.buaa.debug.entity.Statement;
@@ -14,15 +19,61 @@ import sei.buaa.debug.entity.Suspiciousness;
 import sei.buaa.debug.entity.TarantulaSusp;
 import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Version;
+import sei.buaa.debug.utility.Constant;
+import sei.buaa.debug.utility.StringUtility;
 
 public class ProjectAnalyzer {
 		
-	Parser parser = new Parser();
+	Map<Integer,List<Integer> > faults = null;
+	List<Integer> versions = null;
+	String programName;
+	String programDir;
 	
-	public void analyzerVersion(List<TestCase> list)
+	private int totalVersions;
+	private int availableVersions;
+	
+	SiemensAnalyzer sa;
+	
+	public ProjectAnalyzer(SiemensAnalyzer sa,String programDir)
+	{
+		this.programDir = programDir;
+		this.sa = sa;
+		totalVersions = 0;
+		availableVersions = 0;
+		programName = StringUtility.getBaseName(programDir);
+		faults = new HashMap<Integer,List<Integer> >();
+		versions = new ArrayList<Integer>();
+		init();
+	}
+	
+	private void init()
+	{
+		getVersionsInfo(programDir+"/versions.txt");
+		getFaultLocation(programDir+"/faults.txt");
+	}
+	
+	public void analyze()
+	{
+		Parser parser = new Parser();
+		for (int vid:versions)
+		{
+			System.out.println("analyzing program " + programName + ",verions " + vid);
+			Version v = new Version();
+			v.setName(programName);
+			v.setVersionId(vid);
+			v.addFaults(faults);
+			totalVersions++;
+			if (v.getFaultNumber() != 1)continue;
+			
+			List<TestCase> list = parser.parser(programDir+"/"+Constant.OUT_PUT_DIR+"/v"+vid);
+			v.setTotalExecutableCode(list.get(0).getStatements().size());
+			analyzeVersion(v, list);
+		}
+	}
+	
+	public void analyzeVersion(Version v,List<TestCase> list)
 	{
 		Map<Integer,StatementSum> map = new HashMap<Integer,StatementSum>();
-		Version v = new Version();
 		for (TestCase tc: list)
 		{
 			boolean isPassed = tc.isPassed();
@@ -49,8 +100,11 @@ public class ProjectAnalyzer {
 				}
 			}
 		}
+
+		if (v.getTotalFailedCount() == 0)return ;
+		availableVersions++;
 		
-		System.out.println(v);
+		//System.out.println(v);
 		List<Suspiciousness> tarantulaSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> jaccardSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> ochiaiSusps = new ArrayList<Suspiciousness>();
@@ -70,38 +124,100 @@ public class ProjectAnalyzer {
 			OchiaiSusp os = new OchiaiSusp(eSum.getLineNumber());
 			os.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11());
 			ochiaiSusps.add(os);
-			
-			System.out.println("--------------");
-			System.out.println(eSum);
-			System.out.println(s);
-			System.out.println(os);
 		}
 		
-//		System.out.println("--------Tarantula----------");
-//		rank(tarantulaSusps);
-//		System.out.println("--------Jaccard----------");
-//		rank(jaccardSusps);
-//		System.out.println("--------Ochiai----------");
-		rank(ochiaiSusps);
+		rank(v,tarantulaSusps,TarantulaSusp.class.getSimpleName(),sa.getTarantulaExp());
+		rank(v,jaccardSusps,JaccardSusp.class.getSimpleName(),sa.getJaccardExp());
+		rank(v,ochiaiSusps,OchiaiSusp.class.getSimpleName(),sa.getOchiaiExp());
 	}
 	
-	private void rank(List<Suspiciousness> susp)
+	private void rank(Version v,List<Suspiciousness> susp,String fl,Expensive exp)
 	{
 		Collections.sort(susp);
-		for (Suspiciousness s : susp)
-		{
-			System.out.println(s);
-		}
+		v.calcExamineEffort(susp);
+		v.writeResultToFile(susp, programDir+"/FL",fl);
+		exp.addExpensive(v.getExpensive());
 	}
+	
+	public void getFaultLocation(String faultFile)
+	{
+		BufferedReader br = null;
+		FileReader fr = null;
+		String str;		
+		try {
+			fr = new FileReader(faultFile);			
+			br = new BufferedReader(fr);
+			
+			str = br.readLine();			
+			while (str != null)
+			{
+				String[] nums = str.split("\\s+");
+				int versionId = Integer.parseInt(nums[0]);
+				List<Integer> fault = new ArrayList<Integer>();
+				for (int i = 1; i < nums.length; i++)
+				{
+					fault.add(Integer.parseInt(nums[i]));
+				}
+				
+				faults.put(versionId, fault);
+				// read another line
+				str = br.readLine();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally
+		{
+			try {
+				fr.close();
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+		
+//		for (Integer key : faults.keySet())
+//		{
+//			for (Integer value : faults.get(key))
+//			{
+//				System.out.println("version="+key+",fault="+value);
+//			}
+//		}
+	}
+	
+	private void getVersionsInfo(String versionFile) {
+		BufferedReader bufferReader = null;
+		String str = null;
+
+		try {
+			bufferReader = new BufferedReader(new FileReader(versionFile));
+			str = bufferReader.readLine();
+
+			while (str != null) {
+				versions.add(Integer.parseInt(str));
+				str = bufferReader.readLine();
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
 	
 	public static void main(String[] args)
 	{
-		Parser parser = new Parser();
-		List<TestCase> list = parser.parser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2");
-		ProjectAnalyzer pa = new ProjectAnalyzer();
-		pa.analyzerVersion(list);
-		//parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_1797_0");
-		//parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_2002_1");
+	}
+
+	public int getTotalVersions() {
+		return totalVersions;
+	}
+
+	public int getAvailableVersions() {
+		return availableVersions;
 	}
 
 }

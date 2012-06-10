@@ -39,7 +39,7 @@ public class ScriptGenerator {
 		programBodyGen();
 
 		FileUtility.writeContentToFile(sb.toString(),
-				"/Users/csea/Documents/Experiment/Siemens/testCase_"+programName+".sh");
+				programDir+"/testCase_"+programName+".sh");
 	}
 
 	private void getVersionsInfo(String versionFile) {
@@ -53,7 +53,6 @@ public class ScriptGenerator {
 			while (str != null) {
 				versions.add(Integer.parseInt(str));
 				str = bufferReader.readLine();
-
 			}
 
 		} catch (FileNotFoundException e) {
@@ -134,7 +133,7 @@ public class ScriptGenerator {
 			sb.append("\t\ti=1\n");
 
 			// generator test case execution script
-			testCaseGen(programDir + Constant.TEST_PLAN_DIR + testPlanFile);
+			testCaseGen(programDir + Constant.TEST_PLAN_DIR + testPlanFile,versionId);
 
 			sb.append("\t\trm originalResult.txt\n");
 			sb.append("\t\trm currentResult.txt\n");
@@ -146,20 +145,20 @@ public class ScriptGenerator {
 		sb.append("\trm $programName.exe\n");
 	}
 
-	private void testCaseGen(String testPlanPath) {
+	private void testCaseGen(String testPlanPath,int versionId) {
 		BufferedReader bufferReader = null;
 		String str = null;
 		String testCase = null;
-		// int i = 0;
+		 int i = 0;
 		try {
 			bufferReader = new BufferedReader(new FileReader(testPlanPath));
 
 			str = bufferReader.readLine();
-
+	
 			while (str != null) {
 				// if (i++ > 10)break;
 				testCase = convert(str);
-				testCaseExecution(testCase);
+				testCaseExecution(testCase,versionId,++i);
 				str = bufferReader.readLine();
 			}
 
@@ -174,13 +173,21 @@ public class ScriptGenerator {
 		}
 	}
 
-	private void testCaseExecution(String testCase) {
-		sb.append("\t\techo \"${programName}_${version} >>>>>>>>>>>>>>>>>>>>> ")
-				.append(testCase).append("\"\n");
+	private void testCaseExecution(String testCase,int versionId,int testCaseId) {
+		sb.append("\t\techo \"${programName}_${version} >>>>>>>>>>>>>>>>>>>>> test case ")
+				.append(testCaseId).append("\"\n");
+		
+		sb.append("\t\t./").append(programName).append(".exe ").append(testCase).append(" > originalResult.txt\n");
+		sb.append("\t\t./").append(programName).append("_").append(String.valueOf(versionId)).append(".exe ").append(testCase).append(" > currentResult.txt\n");
+		
+		/*
 		sb.append("\t\t./$programName.exe ").append(testCase)
 				.append(" > originalResult.txt\n");
 		sb.append("\t\t./${programName}_${version}.exe ").append(testCase)
 				.append(" > currentResult.txt\n");
+		*/
+		
+		
 		sb.append("\t\tgcov $programName.c\n");
 
 		sb.append("\t\tdiff originalResult.txt currentResult.txt\n");
@@ -211,8 +218,19 @@ public class ScriptGenerator {
 	}
 
 	public static void main(String args[]) {
-		new ScriptGenerator().runScriptGen(
-				"/Users/csea/Documents/Experiment/Siemens/schedule", null);
+		
+		if (args.length == 0)
+		{
+			System.out.println("Invalid Usage!");
+			System.out.println("Usage: ScriptGenerator [programDir1 programDir2 ...]");
+		}
+		else 
+		{
+			for (String s: args)
+			{
+				new ScriptGenerator().runScriptGen(s, null);
+			}
+		}
 	}
 
 }
