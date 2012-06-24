@@ -1,10 +1,13 @@
 package sei.buaa.debug.core;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.TestCase;
@@ -12,6 +15,53 @@ import sei.buaa.debug.utility.StringUtility;
 
 
 public class Parser {
+	
+	public List<TestCase> addCoincidentalCorrectnessInfo(List<TestCase> list,String ccFilePath)
+	{
+		Set<Integer> set = new HashSet<Integer>();
+		File file = new File(ccFilePath);
+		if (file.exists())
+		{
+			BufferedReader br = null;
+			FileReader fr = null;
+			String str;		
+			
+			try {
+				fr = new FileReader(file);
+				br = new BufferedReader(fr);
+				
+				str = br.readLine();
+				
+				while (!StringUtility.IsNullOrEmpty(str))
+				{
+					int testCaseId = Integer.parseInt(str);
+					testCaseId++;
+					set.add(testCaseId);
+					//System.out.println(ccFilePath+":"+testCaseId);
+					
+					str = br.readLine();
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+		else 
+		{
+			System.out.println("CCFile doesn't exist!");
+		}
+		
+		for (TestCase t:list)
+		{
+			if (set.contains(t.getId()))
+			{
+				t.setCoincidentalCorrectness(true);
+			}
+		}
+		
+		return list;
+	}
 	
 	public List<TestCase> parser(String gcovDir)
 	{

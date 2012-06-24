@@ -17,9 +17,7 @@ public class StringUtility {
 		int ret = 0;
 		int base = 1;
 		for (int i = pos; i >= 0 && i < str.length() && Character.isDigit(str.charAt(i)); i--)
-		{
-			
-			
+		{		
 			ret += base*(str.charAt(i)-'0');
 			base *= 10;
 		}

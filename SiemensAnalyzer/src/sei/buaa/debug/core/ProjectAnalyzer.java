@@ -13,6 +13,7 @@ import java.util.Map;
 import sei.buaa.debug.entity.Expensive;
 import sei.buaa.debug.entity.JaccardSusp;
 import sei.buaa.debug.entity.OchiaiSusp;
+import sei.buaa.debug.entity.SBISusp;
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
 import sei.buaa.debug.entity.Suspiciousness;
@@ -30,16 +31,26 @@ public class ProjectAnalyzer {
 	String programDir;
 	
 	private int totalVersions;
-	private int availableVersions;
+	private int singleFaultVersions;
+	private int multiFaultsVersions;
+	private int nonFaultVersions;
+	private int analyzeVersions;
+	private boolean coincidentalCorrectnessEnable = false;
+	private boolean coincidentalCorrectnessAbandon = false;
+	private StringBuilder diagnosisContent = new StringBuilder();
 	
 	SiemensAnalyzer sa;
 	
-	public ProjectAnalyzer(SiemensAnalyzer sa,String programDir)
+	public ProjectAnalyzer(SiemensAnalyzer sa,String programDir,boolean coincidentalCorrectnessEnable,boolean coincidentalCorrectnessAbandon)
 	{
+		this.coincidentalCorrectnessEnable = coincidentalCorrectnessEnable;
+		this.coincidentalCorrectnessAbandon = coincidentalCorrectnessAbandon;
 		this.programDir = programDir;
 		this.sa = sa;
 		totalVersions = 0;
-		availableVersions = 0;
+		singleFaultVersions = 0;
+		nonFaultVersions = 0;
+		analyzeVersions = 0;
 		programName = StringUtility.getBaseName(programDir);
 		faults = new HashMap<Integer,List<Integer> >();
 		versions = new ArrayList<Integer>();
@@ -57,18 +68,47 @@ public class ProjectAnalyzer {
 		Parser parser = new Parser();
 		for (int vid:versions)
 		{
-			System.out.println("analyzing program " + programName + ",verions " + vid);
 			Version v = new Version();
 			v.setName(programName);
 			v.setVersionId(vid);
 			v.addFaults(faults);
 			totalVersions++;
-			if (v.getFaultNumber() != 1)continue;
+			
+			diagnosisContent.append("\n");
+			if (v.getFaultNumber() > 1)
+			{
+				multiFaultsVersions++;
+				diagnosisContent.append("program="+programName+",version="+vid+" is a mutil-faults version").append("\n");
+			}
+			else if (v.getFaultNumber() < 1)
+			{
+				nonFaultVersions++;
+				diagnosisContent.append("program="+programName+",version="+vid+" is a non-fault version").append("\n");
+			}
+			
+			if (v.getFaultNumber() != 1)
+			{
+				continue;
+			}
+			singleFaultVersions++;
 			
 			List<TestCase> list = parser.parser(programDir+"/"+Constant.OUT_PUT_DIR+"/v"+vid);
+			if (coincidentalCorrectnessEnable)list = parser.addCoincidentalCorrectnessInfo(list, 
+					programDir+"/"+Constant.COINCIDENTAL_CORRECTNESS_DIR+"coincidentalCorrectness."+vid);
 			v.setTotalExecutableCode(list.get(0).getStatements().size());
 			analyzeVersion(v, list);
 		}
+	}
+	
+	public boolean isPassed(TestCase t)
+	{
+		if (coincidentalCorrectnessEnable)
+		{
+			if (t.isPassed() && t.isCoincidentalCorrectness())
+				return false;
+		}
+		
+		return t.isPassed();
 	}
 	
 	public void analyzeVersion(Version v,List<TestCase> list)
@@ -76,17 +116,23 @@ public class ProjectAnalyzer {
 		Map<Integer,StatementSum> map = new HashMap<Integer,StatementSum>();
 		for (TestCase tc: list)
 		{
-			boolean isPassed = tc.isPassed();
+			boolean isPassed = isPassed(tc);
 			if (isPassed)
 				v.passedIncrement();
-			else v.failedIncrement();
+			else
+			{
+				if (tc.isCoincidentalCorrectness() && coincidentalCorrectnessEnable && coincidentalCorrectnessAbandon)
+					;
+				else
+					v.failedIncrement();
+			}
 			
 			for (Statement s: tc.getStatements())
 			{
 				if (map.containsKey(s.getLineNumber()))
 				{
 					StatementSum eSum = map.get(s.getLineNumber());
-					if (s.isExecutedOrNot() == 1)
+					if (s.isExecuted())
 					{
 						if (isPassed)
 							eSum.incrementA10();
@@ -101,13 +147,18 @@ public class ProjectAnalyzer {
 			}
 		}
 
-		if (v.getTotalFailedCount() == 0)return ;
-		availableVersions++;
+		if (v.getTotalFailedCount() == 0) 
+		{
+			diagnosisContent.append("program="+programName+",version="+v.getVersionId()+" has no failed test cases").append("\n");
+			return ;
+		}
+		analyzeVersions++;
+		diagnosisContent.append("analyzing program " + programName + ",verions " + v.getVersionId()).append("\n");
 		
-		//System.out.println(v);
 		List<Suspiciousness> tarantulaSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> jaccardSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> ochiaiSusps = new ArrayList<Suspiciousness>();
+		List<Suspiciousness> sbiSusps = new ArrayList<Suspiciousness>();
 		for (StatementSum eSum : map.values())
 		{
 			eSum.setA00(v.getTotalPassedCount()-eSum.getA10());
@@ -124,19 +175,30 @@ public class ProjectAnalyzer {
 			OchiaiSusp os = new OchiaiSusp(eSum.getLineNumber());
 			os.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11());
 			ochiaiSusps.add(os);
+			
+			SBISusp sbi = new SBISusp(eSum.getLineNumber());
+			sbi.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11());
+			sbiSusps.add(sbi);
 		}
-		
-		rank(v,tarantulaSusps,TarantulaSusp.class.getSimpleName(),sa.getTarantulaExp());
-		rank(v,jaccardSusps,JaccardSusp.class.getSimpleName(),sa.getJaccardExp());
-		rank(v,ochiaiSusps,OchiaiSusp.class.getSimpleName(),sa.getOchiaiExp());
+		diagnosisContent.append(v.getFaultInfo(map));
+		rank(v,tarantulaSusps,TarantulaSusp.class.getSimpleName(),sa.getTarantulaExp(),map);
+		rank(v,jaccardSusps,JaccardSusp.class.getSimpleName(),sa.getJaccardExp(),map);
+		rank(v,ochiaiSusps,OchiaiSusp.class.getSimpleName(),sa.getOchiaiExp(),map);
+		rank(v,sbiSusps,SBISusp.class.getSimpleName(),sa.getSbiExp(),map);
 	}
 	
-	private void rank(Version v,List<Suspiciousness> susp,String fl,Expensive exp)
+	private void rank(Version v,List<Suspiciousness> susp,String fl,Expensive exp,Map<Integer,StatementSum> map)
 	{
 		Collections.sort(susp);
+		
 		v.calcExamineEffort(susp);
 		v.writeResultToFile(susp, programDir+"/FL",fl);
 		exp.addExpensive(v.getExpensive());
+		v.setTechnique(fl);
+		diagnosisContent.append(v);
+		StatementSum sum = map.get(susp.get(0).getLineNumber());
+		if (sum != null)
+			diagnosisContent.append("MostSuspStatement:"+sum.getLineNumber()).append(" ExecutionInfo:[a00="+sum.getA00()+",a10="+sum.getA10()+",a01="+sum.getA01()+",a11="+sum.getA11()+"]").append("\n");
 	}
 	
 	public void getFaultLocation(String faultFile)
@@ -216,8 +278,25 @@ public class ProjectAnalyzer {
 		return totalVersions;
 	}
 
-	public int getAvailableVersions() {
-		return availableVersions;
+	public int getSingleFaultVersions() {
+		return singleFaultVersions;
 	}
+
+	public int getMultiFaultsVersions() {
+		return multiFaultsVersions;
+	}
+
+	public int getNonFaultVersions() {
+		return nonFaultVersions;
+	}
+
+	public int getAnalyzeVersions() {
+		return analyzeVersions;
+	}
+
+	public StringBuilder getDiagnosisContent() {
+		return diagnosisContent;
+	}
+
 
 }

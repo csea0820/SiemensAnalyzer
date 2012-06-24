@@ -7,6 +7,7 @@ public class TestCase {
 	
 	private int id;
 	private boolean passed;
+	private boolean isCoincidentalCorrectness = false;
 
 	List<Statement> statements = null;
 
@@ -61,6 +62,14 @@ public class TestCase {
 
 	public List<Statement> getStatements() {
 		return statements;
+	}
+
+	public boolean isCoincidentalCorrectness() {
+		return isCoincidentalCorrectness;
+	}
+
+	public void setCoincidentalCorrectness(boolean isCoincidentalCorrectness) {
+		this.isCoincidentalCorrectness = isCoincidentalCorrectness;
 	}
 	
 }

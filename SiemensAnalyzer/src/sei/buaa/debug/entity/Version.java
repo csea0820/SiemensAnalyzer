@@ -17,6 +17,7 @@ public class Version {
 	List<Integer> faults = null;
 	private int examineEffort;
 	private double expensive;
+	private String technique;
 	
 	
 	public Version()
@@ -49,6 +50,17 @@ public class Version {
 	public void addFault(int lineNumber)
 	{
 		faults.add(lineNumber);
+	}
+	
+	public String getFaultInfo(Map<Integer,StatementSum> map)
+	{
+		String res = "faultLocation:"+faults.get(0);
+		StatementSum sum = map.get(faults.get(0));
+		if (sum != null)
+		{
+			res += " ExecutionInfo:[a00="+sum.getA00()+",a10="+sum.getA10()+",a01="+sum.getA01()+",a11="+sum.getA11()+"]";
+		}
+		return res+"\n";
 	}
 	
 	public int getFault()
@@ -101,7 +113,8 @@ public class Version {
 	
 	public String toString()
 	{
-		return "[program="+name+",version="+versionId+",totalPassedCount="
+		return  "[technique="+technique+
+				",program="+name+",version="+versionId+",totalPassedCount="
 				+totalPassedCount+",totalFailedCoount="+totalFailedCount+",examineEffort="+examineEffort+
 				",expensive="+examineEffort*1.0/totalExecutableCode+"]";
 	}
@@ -116,6 +129,10 @@ public class Version {
 
 	public double getExpensive() {
 		return expensive;
+	}
+
+	public void setTechnique(String technique) {
+		this.technique = technique;
 	}
 
 }

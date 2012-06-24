@@ -24,8 +24,8 @@ public class Statement {
 		this.count = count;
 	}
 	
-	public int isExecutedOrNot()
+	public boolean isExecuted()
 	{
-		return count == 0 ? 0:1;
+		return count != 0;
 	}	
 }
