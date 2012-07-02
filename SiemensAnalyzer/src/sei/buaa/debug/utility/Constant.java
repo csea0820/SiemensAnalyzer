@@ -13,5 +13,6 @@ public class Constant {
 	public static final String JACCARD = "Jaccard";
 	public static final String OCHIAI = "Ochiai";
 	public static final String SBI = "SBI";
+	public static final String WONG = "Wong";
 
 }

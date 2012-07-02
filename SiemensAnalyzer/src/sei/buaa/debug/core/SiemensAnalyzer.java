@@ -14,6 +14,7 @@ public class SiemensAnalyzer {
 	Expensive jaccardExp = new Expensive(Constant.JACCARD);
 	Expensive ochiaiExp = new Expensive(Constant.OCHIAI);
 	Expensive sbiExp = new Expensive(Constant.SBI);
+	Expensive WongExp = new Expensive(Constant.WONG);
 	
 	private int totalVersions;
 	private int singleFaultsVersions;
@@ -49,14 +50,22 @@ public class SiemensAnalyzer {
 	
 	private void evaluation()
 	{
-		sb.append("I").append("\t").append("T").append("\t").append("J").append("\t")
-							  .append("O").append("\t").append("S").append("\n");
+		sb.append(String.format("%-10s","Interval")).append("\t")
+		.append(String.format("%-10s", "Tarantula")).append("\t")
+		.append(String.format("%-10s", "Jaccard")).append("\t")
+		.append(String.format("%-10s", "Ochiai")).append("\t")
+		.append(String.format("%-10s", "Sbi")).append("\t")
+		.append(String.format("%-10s", "Wong")).append("\n");
+		
 		int a = 1;
 		while (a != 11)
 		{
-			sb.append((a-1)*10).append("-").append(a*10).append("\t");
-			sb.append(tarantulaExp.getIntervalNumber(a*1.0/10)).append("\t").append(jaccardExp.getIntervalNumber(a*1.0/10)).append("\t")
-								.append(ochiaiExp.getIntervalNumber(a*1.0/10)).append("\t").append(sbiExp.getIntervalNumber(a*1.0/10)).append("\n");
+			sb.append(String.format("%-10s",((a-1)*10+"-"+a*10))).append("\t");
+			sb.append(String.format("%-10d",tarantulaExp.getIntervalNumber(a*1.0/10))).append("\t")
+			.append(String.format("%-10d",jaccardExp.getIntervalNumber(a*1.0/10))).append("\t")
+			.append(String.format("%-10d",ochiaiExp.getIntervalNumber(a*1.0/10))).append("\t")
+			.append(String.format("%-10d",sbiExp.getIntervalNumber(a*1.0/10))).append("\t")
+			.append(String.format("%-10d",WongExp.getIntervalNumber(a*1.0/10))).append("\n");
 			a += 1;
 		}
 		
@@ -98,6 +107,10 @@ public class SiemensAnalyzer {
 
 	public Expensive getSbiExp() {
 		return sbiExp;
+	}
+
+	public Expensive getWongExp() {
+		return WongExp;
 	}
 
 }

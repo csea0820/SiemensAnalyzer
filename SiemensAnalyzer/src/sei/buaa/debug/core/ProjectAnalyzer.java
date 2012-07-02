@@ -20,6 +20,7 @@ import sei.buaa.debug.entity.Suspiciousness;
 import sei.buaa.debug.entity.TarantulaSusp;
 import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Version;
+import sei.buaa.debug.entity.WongSusp;
 import sei.buaa.debug.utility.Constant;
 import sei.buaa.debug.utility.StringUtility;
 
@@ -102,11 +103,11 @@ public class ProjectAnalyzer {
 	
 	public boolean isPassed(TestCase t)
 	{
-		if (coincidentalCorrectnessEnable)
-		{
-			if (t.isPassed() && t.isCoincidentalCorrectness())
-				return false;
-		}
+//		if (coincidentalCorrectnessEnable)
+//		{
+//			if (t.isPassed() && t.isCoincidentalCorrectness())
+//				return false;
+//		}
 		
 		return t.isPassed();
 	}
@@ -121,9 +122,9 @@ public class ProjectAnalyzer {
 				v.passedIncrement();
 			else
 			{
-				if (tc.isCoincidentalCorrectness() && coincidentalCorrectnessEnable && coincidentalCorrectnessAbandon)
-					;
-				else
+//				if (tc.isCoincidentalCorrectness() && coincidentalCorrectnessEnable && coincidentalCorrectnessAbandon)
+//					;
+//				else
 					v.failedIncrement();
 			}
 			
@@ -159,6 +160,8 @@ public class ProjectAnalyzer {
 		List<Suspiciousness> jaccardSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> ochiaiSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> sbiSusps = new ArrayList<Suspiciousness>();
+		List<Suspiciousness> wongSusps = new ArrayList<Suspiciousness>();
+		
 		for (StatementSum eSum : map.values())
 		{
 			eSum.setA00(v.getTotalPassedCount()-eSum.getA10());
@@ -179,12 +182,17 @@ public class ProjectAnalyzer {
 			SBISusp sbi = new SBISusp(eSum.getLineNumber());
 			sbi.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11());
 			sbiSusps.add(sbi);
+			
+			WongSusp wong = new WongSusp(eSum.getLineNumber());
+			wong.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11());
+			wongSusps.add(wong);
 		}
 		diagnosisContent.append(v.getFaultInfo(map));
 		rank(v,tarantulaSusps,TarantulaSusp.class.getSimpleName(),sa.getTarantulaExp(),map);
 		rank(v,jaccardSusps,JaccardSusp.class.getSimpleName(),sa.getJaccardExp(),map);
 		rank(v,ochiaiSusps,OchiaiSusp.class.getSimpleName(),sa.getOchiaiExp(),map);
 		rank(v,sbiSusps,SBISusp.class.getSimpleName(),sa.getSbiExp(),map);
+		rank(v,wongSusps,WongSusp.class.getSimpleName(),sa.getWongExp(),map);
 	}
 	
 	private void rank(Version v,List<Suspiciousness> susp,String fl,Expensive exp,Map<Integer,StatementSum> map)
