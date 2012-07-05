@@ -22,7 +22,7 @@ public class SiemensAnalyzer {
 	private int nonFaultVersions;
 	private int analyzeVersions;
 	
-	private StringBuilder sb = new StringBuilder();
+	private StringBuilder sb = new StringBuilder(5000);
 
 
 	
@@ -77,7 +77,7 @@ public class SiemensAnalyzer {
 	{
 		Date date=new Date();
 		SimpleDateFormat formater=new SimpleDateFormat();
-		formater.applyPattern("yyyyMMddHHmm");
+		formater.applyPattern("yyyy_MM_dd_HH_mm");
 		return formater.format(date);
 	}
 	
