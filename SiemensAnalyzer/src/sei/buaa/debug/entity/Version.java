@@ -25,13 +25,6 @@ public class Version {
 		faults = new HashSet<Integer>();
 	}
 
-	public void passedIncrement() {
-		totalPassedCount++;
-	}
-
-	public void failedIncrement() {
-		totalFailedCount++;
-	}
 
 	public int getVersionId() {
 		return versionId;
@@ -104,6 +97,7 @@ public class Version {
 				break;
 			}
 		}
+		System.out.println("totalExecutableCode:"+totalExecutableCode);
 		expensive = examineEffort * 1.0 / totalExecutableCode;
 	}
 
@@ -141,6 +135,18 @@ public class Version {
 
 	public void setTechnique(String technique) {
 		this.technique = technique;
+	}
+
+
+
+	public void setTotalPassedCount(int totalPassedCount) {
+		this.totalPassedCount = totalPassedCount;
+	}
+
+
+
+	public void setTotalFailedCount(int totalFailedCount) {
+		this.totalFailedCount = totalFailedCount;
 	}
 
 }

@@ -40,6 +40,7 @@ public class SiemensAnalyzer {
 			nonFaultVersions += pa.getNonFaultVersions();
 			analyzeVersions += pa.getAnalyzeVersions();
 			sb.append(pa.getDiagnosisContent());
+			System.gc();
 		}
 		sb.append("Total Versions:" + totalVersions).append("\n");
 		sb.append("NonFaultVersions :" + nonFaultVersions).append("\n");

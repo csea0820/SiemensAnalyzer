@@ -15,7 +15,8 @@ public class Constant {
 	/**
 	 * presents fault locations for each faulty program.The line number indicates 
 	 * program version id.The content of each line show fault locations information separated by space.
-	 * For example, if the ith line contains the following string: 123 32. It tells us that
+	 * 
+	 * <p>For example, if the ith line contains the following string: 123 32. It tells us that
 	 * the ith program variant contains two bug, which are located in 123th and 32th line respectively.
 	 * An empty line indicates the corresponding program variant is absence of fault.
 	 */

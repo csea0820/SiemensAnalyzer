@@ -14,6 +14,7 @@ import sei.buaa.debug.entity.Expensive;
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
 import sei.buaa.debug.entity.TestCase;
+import sei.buaa.debug.entity.Timer;
 import sei.buaa.debug.entity.Version;
 import sei.buaa.debug.metric.JaccardSusp;
 import sei.buaa.debug.metric.OchiaiSusp;
@@ -66,13 +67,14 @@ public class ProjectAnalyzer {
 	}
 
 	public void analyze() {
-		Parser parser = new Parser();
 		for (int vid : versions) {
+			Parser parser = new Parser();
 			Version v = new Version();
 			v.setName(programName);
 			v.setVersionId(vid);
 			v.addFaults(faults);
 			totalVersions++;
+			System.out.println("version:"+vid);
 
 			diagnosisContent.append("\n");
 			if (v.getFaultNumber() > 1) {
@@ -80,6 +82,7 @@ public class ProjectAnalyzer {
 				diagnosisContent.append(
 						"program=" + programName + ",version=" + vid
 								+ " is a mutil-faults version").append("\n");
+				continue;
 			} else if (v.getFaultNumber() < 1) {
 				nonFaultVersionsCnt++;
 				diagnosisContent.append(
@@ -89,14 +92,17 @@ public class ProjectAnalyzer {
 			} else
 				singleFaultVersionsCnt++;
 
-			List<TestCase> list = parser.parser(programDir + "/"
+			Map<Integer, StatementSum> stSum = parser.parser(programDir + "/"
 					+ Constant.OUT_PUT_DIR + "/v" + vid);
-			if (coincidentalCorrectnessEnable)
-				list = parser.addCoincidentalCorrectnessInfo(list, programDir
-						+ "/" + Constant.COINCIDENTAL_CORRECTNESS_DIR
-						+ "coincidentalCorrectness." + vid);
-			v.setTotalExecutableCode(list.get(0).getStatements().size());
-			analyzeVersion(v, list);
+//			if (coincidentalCorrectnessEnable)
+//				list = parser.addCoincidentalCorrectnessInfo(list, programDir
+//						+ "/" + Constant.COINCIDENTAL_CORRECTNESS_DIR
+//						+ "coincidentalCorrectness." + vid);
+			v.setTotalFailedCount(parser.getTotalFailedTestCaseCnt());
+			v.setTotalPassedCount(parser.getTotalPassedTestCaseCnt());
+			v.setTotalExecutableCode(parser.getTotalExecutableCodeCnt());
+			
+			analyzeVersion(v, stSum);
 		}
 	}
 
@@ -110,36 +116,7 @@ public class ProjectAnalyzer {
 		return t.isPassed();
 	}
 
-	public void analyzeVersion(Version v, List<TestCase> list) {
-		Map<Integer, StatementSum> map = new HashMap<Integer, StatementSum>();
-		for (TestCase tc : list) {
-			boolean isPassed = isPassed(tc);
-			if (isPassed)
-				v.passedIncrement();
-			else {
-				// if (tc.isCoincidentalCorrectness() &&
-				// coincidentalCorrectnessEnable &&
-				// coincidentalCorrectnessAbandon)
-				// ;
-				// else
-				v.failedIncrement();
-			}
-
-			for (Statement s : tc.getStatements()) {
-
-				StatementSum eSum = map.get(s.getLineNumber());
-				if (eSum == null) {
-					eSum = new StatementSum(s.getLineNumber());
-					map.put(s.getLineNumber(), eSum);
-				}
-				if (s.isExecuted()) {
-					if (isPassed)
-						eSum.incrementA10();
-					else
-						eSum.incrementA11();
-				}
-			}
-		}
+	public void analyzeVersion(Version v, Map<Integer, StatementSum> map) {
 
 		if (v.getTotalFailedCount() == 0) {
 			diagnosisContent.append(
