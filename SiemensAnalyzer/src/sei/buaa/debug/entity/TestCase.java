@@ -8,8 +8,11 @@ public class TestCase {
 	private int id;
 	private boolean passed;
 	private boolean isCoincidentalCorrectness = false;
+	private int totalExecutedStatementCnt = 0;
 
+	
 	List<Statement> statements = null;
+	
 
 	public TestCase()
 	{
@@ -22,6 +25,11 @@ public class TestCase {
 		this.passed = passed;
 		statements = new ArrayList<Statement>();
 
+	}
+
+	public void incrementExecutedStatements()
+	{
+		totalExecutedStatementCnt++;
 	}
 	
 	public void addStatement(Statement e)
@@ -70,6 +78,10 @@ public class TestCase {
 
 	public void setCoincidentalCorrectness(boolean isCoincidentalCorrectness) {
 		this.isCoincidentalCorrectness = isCoincidentalCorrectness;
+	}
+
+	public int getTotalExecutedStatementCnt() {
+		return totalExecutedStatementCnt;
 	}
 	
 }

@@ -122,6 +122,9 @@ public class Parser {
 					
 					Statement st = new Statement(lineNumber,times);
 					
+					if (times != 0)
+						tc.incrementExecutedStatements();
+					
 					tc.addStatement(st);					
 				}
 				// read another line

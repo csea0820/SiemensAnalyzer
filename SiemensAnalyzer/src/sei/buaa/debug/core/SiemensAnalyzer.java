@@ -15,6 +15,7 @@ public class SiemensAnalyzer {
 	Expensive ochiaiExp = new Expensive(Constant.OCHIAI);
 	Expensive sbiExp = new Expensive(Constant.SBI);
 	Expensive WongExp = new Expensive(Constant.WONG);
+	Expensive siqExp = new Expensive(Constant.SIQ);
 	
 	private int totalVersions;
 	private int singleFaultsVersions;
@@ -55,7 +56,8 @@ public class SiemensAnalyzer {
 		.append(String.format("%-10s", "Jaccard")).append("\t")
 		.append(String.format("%-10s", "Ochiai")).append("\t")
 		.append(String.format("%-10s", "Sbi")).append("\t")
-		.append(String.format("%-10s", "Wong")).append("\n");
+		.append(String.format("%-10s", "Wong")).append("\t")
+		.append(String.format("%-10s", "SIQ")).append("\n");
 		
 		int a = 1;
 		while (a != 11)
@@ -65,7 +67,8 @@ public class SiemensAnalyzer {
 			.append(String.format("%-10d",jaccardExp.getIntervalNumber(a*1.0/10))).append("\t")
 			.append(String.format("%-10d",ochiaiExp.getIntervalNumber(a*1.0/10))).append("\t")
 			.append(String.format("%-10d",sbiExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",WongExp.getIntervalNumber(a*1.0/10))).append("\n");
+			.append(String.format("%-10d",WongExp.getIntervalNumber(a*1.0/10))).append("\t")
+			.append(String.format("%-10d",siqExp.getIntervalNumber(a*1.0/10))).append("\n");
 			a += 1;
 		}
 		
@@ -111,6 +114,10 @@ public class SiemensAnalyzer {
 
 	public Expensive getWongExp() {
 		return WongExp;
+	}
+
+	public Expensive getSiqExp() {
+		return siqExp;
 	}
 
 }

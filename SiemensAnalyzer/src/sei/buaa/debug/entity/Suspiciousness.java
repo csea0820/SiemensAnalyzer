@@ -10,6 +10,7 @@ public abstract class Suspiciousness implements Comparable<Suspiciousness>{
 	List<Suspiciousness> list = null;
 	
 	
+	
 	public Suspiciousness(int ln)
 	{
 		lineNumber = ln;

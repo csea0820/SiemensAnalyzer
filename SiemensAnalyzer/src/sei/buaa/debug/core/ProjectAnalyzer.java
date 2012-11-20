@@ -11,16 +11,17 @@ import java.util.List;
 import java.util.Map;
 
 import sei.buaa.debug.entity.Expensive;
-import sei.buaa.debug.entity.JaccardSusp;
-import sei.buaa.debug.entity.OchiaiSusp;
-import sei.buaa.debug.entity.SBISusp;
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
 import sei.buaa.debug.entity.Suspiciousness;
-import sei.buaa.debug.entity.TarantulaSusp;
 import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Version;
-import sei.buaa.debug.entity.WongSusp;
+import sei.buaa.debug.metric.JaccardSusp;
+import sei.buaa.debug.metric.OchiaiSusp;
+import sei.buaa.debug.metric.SBISusp;
+import sei.buaa.debug.metric.SIQSusp;
+import sei.buaa.debug.metric.TarantulaSusp;
+import sei.buaa.debug.metric.WongSusp;
 import sei.buaa.debug.utility.Constant;
 import sei.buaa.debug.utility.StringUtility;
 
@@ -156,6 +157,7 @@ public class ProjectAnalyzer {
 		List<Suspiciousness> ochiaiSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> sbiSusps = new ArrayList<Suspiciousness>();
 		List<Suspiciousness> wongSusps = new ArrayList<Suspiciousness>();
+		List<Suspiciousness> siqSusps = new ArrayList<Suspiciousness>();
 
 		for (StatementSum eSum : map.values()) {
 			eSum.setA00(v.getTotalPassedCount() - eSum.getA10());
@@ -185,6 +187,11 @@ public class ProjectAnalyzer {
 			wong.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
 					eSum.getA11());
 			wongSusps.add(wong);
+			
+			SIQSusp siq = new SIQSusp(eSum.getLineNumber());
+			siq.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
+					eSum.getA11());
+			siqSusps.add(siq);
 		}
 		diagnosisContent.append(v.getFaultInfo(map));
 		rank(v, tarantulaSusps, TarantulaSusp.class.getSimpleName(),
@@ -195,6 +202,7 @@ public class ProjectAnalyzer {
 				sa.getOchiaiExp(), map);
 		rank(v, sbiSusps, SBISusp.class.getSimpleName(), sa.getSbiExp(), map);
 		rank(v, wongSusps, WongSusp.class.getSimpleName(), sa.getWongExp(), map);
+		rank(v, siqSusps, SIQSusp.class.getSimpleName(), sa.getSiqExp(), map);
 	}
 
 	private void rank(Version v, List<Suspiciousness> susp, String fl,
