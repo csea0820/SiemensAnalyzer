@@ -33,10 +33,10 @@ public class ProjectAnalyzer {
 	String programDir;
 
 	private int totalVersions;
-	private int singleFaultVersions;
-	private int multiFaultsVersions;
-	private int nonFaultVersions;
-	private int analyzeVersions;
+	private int singleFaultVersionsCnt;
+	private int multiFaultsVersionsCnt;
+	private int nonFaultVersionsCnt;
+	private int analyzeVersionsCnt;
 	private boolean coincidentalCorrectnessEnable = false;
 	private boolean coincidentalCorrectnessAbandon = false;
 	private StringBuilder diagnosisContent = new StringBuilder(10000);
@@ -51,9 +51,9 @@ public class ProjectAnalyzer {
 		this.programDir = programDir;
 		this.sa = sa;
 		totalVersions = 0;
-		singleFaultVersions = 0;
-		nonFaultVersions = 0;
-		analyzeVersions = 0;
+		singleFaultVersionsCnt = 0;
+		nonFaultVersionsCnt = 0;
+		analyzeVersionsCnt = 0;
 		programName = StringUtility.getBaseName(programDir);
 		faults = new HashMap<Integer, List<Integer>>();
 		versions = new ArrayList<Integer>();
@@ -61,8 +61,8 @@ public class ProjectAnalyzer {
 	}
 
 	private void init() {
-		getVersionsInfo(programDir + "/versions.txt");
-		getFaultLocation(programDir + "/faults.txt");
+		getVersionsInfo(programDir + Constant.VERSIONS_LIST);
+		getFaultLocation(programDir + Constant.FAULTS_LIST);
 	}
 
 	public void analyze() {
@@ -76,18 +76,18 @@ public class ProjectAnalyzer {
 
 			diagnosisContent.append("\n");
 			if (v.getFaultNumber() > 1) {
-				multiFaultsVersions++;
+				multiFaultsVersionsCnt++;
 				diagnosisContent.append(
 						"program=" + programName + ",version=" + vid
 								+ " is a mutil-faults version").append("\n");
 			} else if (v.getFaultNumber() < 1) {
-				nonFaultVersions++;
+				nonFaultVersionsCnt++;
 				diagnosisContent.append(
 						"program=" + programName + ",version=" + vid
 								+ " is a non-fault version").append("\n");
 				continue;
 			} else
-				singleFaultVersions++;
+				singleFaultVersionsCnt++;
 
 			List<TestCase> list = parser.parser(programDir + "/"
 					+ Constant.OUT_PUT_DIR + "/v" + vid);
@@ -147,7 +147,7 @@ public class ProjectAnalyzer {
 							+ " has no failed test cases").append("\n");
 			return;
 		}
-		analyzeVersions++;
+		analyzeVersionsCnt++;
 		diagnosisContent.append(
 				"analyzing program " + programName + ",verions "
 						+ v.getVersionId()).append("\n");
@@ -294,19 +294,19 @@ public class ProjectAnalyzer {
 	}
 
 	public int getSingleFaultVersions() {
-		return singleFaultVersions;
+		return singleFaultVersionsCnt;
 	}
 
 	public int getMultiFaultsVersions() {
-		return multiFaultsVersions;
+		return multiFaultsVersionsCnt;
 	}
 
 	public int getNonFaultVersions() {
-		return nonFaultVersions;
+		return nonFaultVersionsCnt;
 	}
 
 	public int getAnalyzeVersions() {
-		return analyzeVersions;
+		return analyzeVersionsCnt;
 	}
 
 	public StringBuilder getDiagnosisContent() {

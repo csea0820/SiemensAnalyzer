@@ -37,7 +37,6 @@ public class Parser {
 					int testCaseId = Integer.parseInt(str);
 					testCaseId++;
 					set.add(testCaseId);
-					//System.out.println(ccFilePath+":"+testCaseId);
 					
 					str = br.readLine();
 				}
@@ -51,7 +50,6 @@ public class Parser {
 		{
 			System.out.println("CCFile doesn't exist!");
 		}
-		
 		for (TestCase t:list)
 		{
 			if (set.contains(t.getId()))

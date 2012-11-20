@@ -3,7 +3,7 @@ package sei.buaa.debug.entity;
 public class StatementSum {
 	
 	private int lineNumber;
-	private int a00;
+	private int a00;   
 	private int a10;
 	private int a01;
 	private int a11;
