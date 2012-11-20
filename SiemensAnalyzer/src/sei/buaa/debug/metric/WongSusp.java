@@ -1,8 +1,7 @@
 package sei.buaa.debug.metric;
 
-import sei.buaa.debug.entity.Suspiciousness;
 
-public class WongSusp extends Suspiciousness{
+public class WongSusp extends AbstractSuspiciousness{
 
 	int Nf,Ns;
 	int Nf1,Nf2,Nf3;

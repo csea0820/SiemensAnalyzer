@@ -1,17 +1,17 @@
-package sei.buaa.debug.entity;
+package sei.buaa.debug.metric;
 
 import java.util.List;
 
-public abstract class Suspiciousness implements Comparable<Suspiciousness>{
+public abstract class AbstractSuspiciousness implements Comparable<AbstractSuspiciousness>{
 	
 	protected int lineNumber;
 	protected double susp;
 	
-	List<Suspiciousness> list = null;
+	List<AbstractSuspiciousness> list = null;
 	
 	
 	
-	public Suspiciousness(int ln)
+	public AbstractSuspiciousness(int ln)
 	{
 		lineNumber = ln;
 	}
@@ -45,7 +45,7 @@ public abstract class Suspiciousness implements Comparable<Suspiciousness>{
 		this.susp = susp;
 	}
 	
-	public int compareTo(Suspiciousness arg0) {
+	public int compareTo(AbstractSuspiciousness arg0) {
 		
 		return this.getSusp() > arg0.getSusp() ? 0: 1;
 	}

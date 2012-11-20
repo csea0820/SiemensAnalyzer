@@ -13,13 +13,13 @@ import java.util.Map;
 import sei.buaa.debug.entity.Expensive;
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
-import sei.buaa.debug.entity.Suspiciousness;
 import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Version;
 import sei.buaa.debug.metric.JaccardSusp;
 import sei.buaa.debug.metric.OchiaiSusp;
 import sei.buaa.debug.metric.SBISusp;
 import sei.buaa.debug.metric.SIQSusp;
+import sei.buaa.debug.metric.AbstractSuspiciousness;
 import sei.buaa.debug.metric.TarantulaSusp;
 import sei.buaa.debug.metric.WongSusp;
 import sei.buaa.debug.utility.Constant;
@@ -152,12 +152,12 @@ public class ProjectAnalyzer {
 				"analyzing program " + programName + ",verions "
 						+ v.getVersionId()).append("\n");
 
-		List<Suspiciousness> tarantulaSusps = new ArrayList<Suspiciousness>();
-		List<Suspiciousness> jaccardSusps = new ArrayList<Suspiciousness>();
-		List<Suspiciousness> ochiaiSusps = new ArrayList<Suspiciousness>();
-		List<Suspiciousness> sbiSusps = new ArrayList<Suspiciousness>();
-		List<Suspiciousness> wongSusps = new ArrayList<Suspiciousness>();
-		List<Suspiciousness> siqSusps = new ArrayList<Suspiciousness>();
+		List<AbstractSuspiciousness> tarantulaSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> jaccardSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> ochiaiSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> sbiSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> wongSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> siqSusps = new ArrayList<AbstractSuspiciousness>();
 
 		for (StatementSum eSum : map.values()) {
 			eSum.setA00(v.getTotalPassedCount() - eSum.getA10());
@@ -205,7 +205,7 @@ public class ProjectAnalyzer {
 		rank(v, siqSusps, SIQSusp.class.getSimpleName(), sa.getSiqExp(), map);
 	}
 
-	private void rank(Version v, List<Suspiciousness> susp, String fl,
+	private void rank(Version v, List<AbstractSuspiciousness> susp, String fl,
 			Expensive exp, Map<Integer, StatementSum> map) {
 		Collections.sort(susp);
 

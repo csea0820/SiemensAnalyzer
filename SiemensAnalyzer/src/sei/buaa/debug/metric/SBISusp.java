@@ -1,8 +1,7 @@
 package sei.buaa.debug.metric;
 
-import sei.buaa.debug.entity.Suspiciousness;
 
-public class SBISusp extends Suspiciousness {
+public class SBISusp extends AbstractSuspiciousness {
 
 	public SBISusp(int ln) {
 		super(ln);

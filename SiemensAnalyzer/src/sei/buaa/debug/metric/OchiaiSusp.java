@@ -1,8 +1,7 @@
 package sei.buaa.debug.metric;
 
-import sei.buaa.debug.entity.Suspiciousness;
 
-public class OchiaiSusp extends Suspiciousness {
+public class OchiaiSusp extends AbstractSuspiciousness {
 
 	public OchiaiSusp(int ln) {
 		super(ln);

@@ -1,8 +1,7 @@
 package sei.buaa.debug.metric;
 
-import sei.buaa.debug.entity.Suspiciousness;
 
-public class JaccardSusp extends Suspiciousness {
+public class JaccardSusp extends AbstractSuspiciousness {
 
 	public JaccardSusp(int ln) {
 		super(ln);

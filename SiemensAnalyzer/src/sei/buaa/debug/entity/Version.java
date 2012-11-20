@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import sei.buaa.debug.metric.AbstractSuspiciousness;
 import sei.buaa.debug.utility.FileUtility;
 
 public class Version {
@@ -89,7 +90,7 @@ public class Version {
 			faults.add(f);
 	}
 
-	public void calcExamineEffort(List<Suspiciousness> list) {
+	public void calcExamineEffort(List<AbstractSuspiciousness> list) {
 		examineEffort = 0;
 		for (int i = 0; i < list.size(); i++) {
 			examineEffort++;
@@ -106,11 +107,11 @@ public class Version {
 		expensive = examineEffort * 1.0 / totalExecutableCode;
 	}
 
-	public void writeResultToFile(List<Suspiciousness> list, String path,
+	public void writeResultToFile(List<AbstractSuspiciousness> list, String path,
 			String fl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("lineNumber").append("\t").append("suspiciousness\n");
-		for (Suspiciousness s : list) {
+		for (AbstractSuspiciousness s : list) {
 			sb.append(s.getLineNumber()).append("\t").append(s.getSusp())
 					.append("\n");
 		}
