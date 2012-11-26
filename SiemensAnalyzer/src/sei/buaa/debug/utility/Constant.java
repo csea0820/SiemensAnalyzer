@@ -28,5 +28,6 @@ public class Constant {
 	public static final String SBI = "SBI";
 	public static final String WONG = "Wong";
 	public static final String SIQ = "SIQ";
+	public static final String RA1 = "RA1";
 
 }

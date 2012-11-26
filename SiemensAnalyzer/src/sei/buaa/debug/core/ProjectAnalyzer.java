@@ -18,6 +18,7 @@ import sei.buaa.debug.entity.Timer;
 import sei.buaa.debug.entity.Version;
 import sei.buaa.debug.metric.JaccardSusp;
 import sei.buaa.debug.metric.OchiaiSusp;
+import sei.buaa.debug.metric.RA1Susp;
 import sei.buaa.debug.metric.SBISusp;
 import sei.buaa.debug.metric.SIQSusp;
 import sei.buaa.debug.metric.AbstractSuspiciousness;
@@ -135,6 +136,7 @@ public class ProjectAnalyzer {
 		List<AbstractSuspiciousness> sbiSusps = new ArrayList<AbstractSuspiciousness>();
 		List<AbstractSuspiciousness> wongSusps = new ArrayList<AbstractSuspiciousness>();
 		List<AbstractSuspiciousness> siqSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> ra1Susps = new ArrayList<AbstractSuspiciousness>();
 
 		for (StatementSum eSum : map.values()) {
 			eSum.setA00(v.getTotalPassedCount() - eSum.getA10());
@@ -169,6 +171,11 @@ public class ProjectAnalyzer {
 			siq.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
 					eSum.getA11());
 			siqSusps.add(siq);
+			
+			RA1Susp ra = new RA1Susp(eSum.getLineNumber());
+			ra.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
+					eSum.getA11());
+			ra1Susps.add(ra);
 		}
 		diagnosisContent.append(v.getFaultInfo(map));
 		rank(v, tarantulaSusps, TarantulaSusp.class.getSimpleName(),
@@ -180,6 +187,7 @@ public class ProjectAnalyzer {
 		rank(v, sbiSusps, SBISusp.class.getSimpleName(), sa.getSbiExp(), map);
 		rank(v, wongSusps, WongSusp.class.getSimpleName(), sa.getWongExp(), map);
 		rank(v, siqSusps, SIQSusp.class.getSimpleName(), sa.getSiqExp(), map);
+		rank(v, ra1Susps, RA1Susp.class.getSimpleName(), sa.getRaExp(), map);
 	}
 
 	private void rank(Version v, List<AbstractSuspiciousness> susp, String fl,

@@ -97,7 +97,7 @@ public class Version {
 				break;
 			}
 		}
-		System.out.println("totalExecutableCode:"+totalExecutableCode);
+//		System.out.println("totalExecutableCode:"+totalExecutableCode);
 		expensive = examineEffort * 1.0 / totalExecutableCode;
 	}
 
