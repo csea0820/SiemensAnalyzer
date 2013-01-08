@@ -15,8 +15,11 @@ public class SiemensAnalyzer {
 	Expensive ochiaiExp = new Expensive(Constant.OCHIAI);
 	Expensive sbiExp = new Expensive(Constant.SBI);
 	Expensive WongExp = new Expensive(Constant.WONG);
+	Expensive wong2Exp = new Expensive(Constant.WONG2);
 	Expensive siqExp = new Expensive(Constant.SIQ);
 	Expensive raExp = new Expensive(Constant.RA1);
+	Expensive vwtExp = new Expensive(Constant.VWT);
+
 	
 	private int totalVersions;
 	private int singleFaultsVersions;
@@ -59,24 +62,30 @@ public class SiemensAnalyzer {
 		.append(String.format("%-10s", "Ochiai")).append("\t")
 		.append(String.format("%-10s", "Sbi")).append("\t")
 		.append(String.format("%-10s", "Wong")).append("\t")
+		.append(String.format("%-10s", "Wong2")).append("\t")
 		.append(String.format("%-10s", "SIQ")).append("\t")
-		.append(String.format("%-10s", "RA")).append("\n");
+		.append(String.format("%-10s", "RA")).append("\t")
+		.append(String.format("%-10s", "VWT")).append("\n");
 		
 		int a = 1;
-		while (a != 11)
+		int interval = 5;
+		while (a <= (100/interval))
 		{
-			sb.append(String.format("%-10s",((a-1)*10+"-"+a*10))).append("\t");
-			sb.append(String.format("%-10d",tarantulaExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",jaccardExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",ochiaiExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",sbiExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",WongExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",siqExp.getIntervalNumber(a*1.0/10))).append("\t")
-			.append(String.format("%-10d",raExp.getIntervalNumber(a*1.0/10))).append("\n")
+			sb.append(String.format("%-10s",((a-1)*interval+"-"+a*interval))).append("\t");
+			sb.append(String.format("%-10d",tarantulaExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",jaccardExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",ochiaiExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",sbiExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",WongExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",wong2Exp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",siqExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",raExp.getIntervalNumber(a*0.01*interval))).append("\t")
+			.append(String.format("%-10d",vwtExp.getIntervalNumber(a*0.01*interval))).append("\n")
 			;
 			a += 1;
 		}
 		
+		System.out.println(sb.toString());
 		FileUtility.writeContentToFile(sb.toString(), "/Users/csea/Documents/Experiment/Siemens/result/"+getCurrentDate()+".result");
 		
 	}
@@ -127,6 +136,14 @@ public class SiemensAnalyzer {
 
 	public Expensive getRaExp() {
 		return raExp;
+	}
+
+	public Expensive getVwtExp() {
+		return vwtExp;
+	}
+
+	public Expensive getWong2Exp() {
+		return wong2Exp;
 	}
 
 }

@@ -8,10 +8,36 @@ public class StatementSum {
 	private int a01;
 	private int a11;
 	
+	private double d_a11;
+	private double d_a10;
+	private double d_a01;
+	private double d_a00;
+	
 	
 	public StatementSum(int lineNumber)
 	{
 		this.lineNumber = lineNumber;
+	}
+	
+	
+	public void addToDA00(double w)
+	{
+		d_a00 += w;
+	}
+	
+	public void addToDA01(double w)
+	{
+		d_a01 += w;
+	}
+	
+	public void addToDA10(double w)
+	{
+		d_a10 += w;
+	}
+	
+	public void addToDA11(double w)
+	{
+		d_a11 += w;
 	}
 	
 	public void incrementA10()
@@ -56,8 +82,47 @@ public class StatementSum {
 	}
 	
 	
-	public String toString()
-	{
-		return "[lineNumber="+lineNumber+",a00="+a00+",a01="+a01+",a10="+a10+",a11="+a11+"]";
+	@Override
+	public String toString() {
+		return "StatementSum [lineNumber=" + lineNumber + ", a00=" + a00
+				+ ", a10=" + a10 + ", a01=" + a01 + ", a11=" + a11 + ", d_a11="
+				+ d_a11 + ", d_a10=" + d_a10 + ", d_a01=" + d_a01 + ", d_a00="
+				+ d_a00 + "]";
+	}
+
+	public double getD_a11() {
+		return d_a11;
+	}
+
+	public void setD_a11(double d_a11) {
+		this.d_a11 = d_a11;
+	}
+
+	public double getD_a10() {
+		return d_a10;
+	}
+
+	public void setD_a10(double d_a10) {
+		this.d_a10 = d_a10;
+	}
+
+
+	public double getD_a01() {
+		return d_a01;
+	}
+
+
+	public void setD_a01(double d_a01) {
+		this.d_a01 = d_a01;
+	}
+
+
+	public double getD_a00() {
+		return d_a00;
+	}
+
+
+	public void setD_a00(double d_a00) {
+		this.d_a00 = d_a00;
 	}
 }

@@ -29,5 +29,8 @@ public class Constant {
 	public static final String WONG = "Wong";
 	public static final String SIQ = "SIQ";
 	public static final String RA1 = "RA1";
+	public static final String VWT = "VWT";
+	public static final String WONG2 = "Wong2";
+
 
 }

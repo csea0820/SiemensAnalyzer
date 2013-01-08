@@ -23,6 +23,8 @@ import sei.buaa.debug.metric.SBISusp;
 import sei.buaa.debug.metric.SIQSusp;
 import sei.buaa.debug.metric.AbstractSuspiciousness;
 import sei.buaa.debug.metric.TarantulaSusp;
+import sei.buaa.debug.metric.VWTSusp;
+import sei.buaa.debug.metric.Wong2Susp;
 import sei.buaa.debug.metric.WongSusp;
 import sei.buaa.debug.utility.Constant;
 import sei.buaa.debug.utility.StringUtility;
@@ -103,6 +105,8 @@ public class ProjectAnalyzer {
 			v.setTotalPassedCount(parser.getTotalPassedTestCaseCnt());
 			v.setTotalExecutableCode(parser.getTotalExecutableCodeCnt());
 			
+
+			
 			analyzeVersion(v, stSum);
 		}
 	}
@@ -137,11 +141,15 @@ public class ProjectAnalyzer {
 		List<AbstractSuspiciousness> wongSusps = new ArrayList<AbstractSuspiciousness>();
 		List<AbstractSuspiciousness> siqSusps = new ArrayList<AbstractSuspiciousness>();
 		List<AbstractSuspiciousness> ra1Susps = new ArrayList<AbstractSuspiciousness>();
-
+		List<AbstractSuspiciousness> vwtSusps = new ArrayList<AbstractSuspiciousness>();
+		List<AbstractSuspiciousness> wong2Susps = new ArrayList<AbstractSuspiciousness>();
+		
 		for (StatementSum eSum : map.values()) {
 			eSum.setA00(v.getTotalPassedCount() - eSum.getA10());
 			eSum.setA01(v.getTotalFailedCount() - eSum.getA11());
 
+//  		System.out.println(eSum);
+			
 			TarantulaSusp s = new TarantulaSusp(eSum.getLineNumber());
 			s.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
 					eSum.getA11());
@@ -167,6 +175,11 @@ public class ProjectAnalyzer {
 					eSum.getA11());
 			wongSusps.add(wong);
 			
+			Wong2Susp wong2 = new Wong2Susp(eSum.getLineNumber());
+			wong2.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
+					eSum.getA11());
+			wong2Susps.add(wong2);
+			
 			SIQSusp siq = new SIQSusp(eSum.getLineNumber());
 			siq.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
 					eSum.getA11());
@@ -176,7 +189,14 @@ public class ProjectAnalyzer {
 			ra.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
 					eSum.getA11());
 			ra1Susps.add(ra);
+			
+			VWTSusp vs = new VWTSusp(eSum.getLineNumber());
+			vs.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
+					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
+			vwtSusps.add(vs);
 		}
+		
+		
 		diagnosisContent.append(v.getFaultInfo(map));
 		rank(v, tarantulaSusps, TarantulaSusp.class.getSimpleName(),
 				sa.getTarantulaExp(), map);
@@ -186,8 +206,10 @@ public class ProjectAnalyzer {
 				sa.getOchiaiExp(), map);
 		rank(v, sbiSusps, SBISusp.class.getSimpleName(), sa.getSbiExp(), map);
 		rank(v, wongSusps, WongSusp.class.getSimpleName(), sa.getWongExp(), map);
+		rank(v, wong2Susps, Wong2Susp.class.getSimpleName(), sa.getWong2Exp(), map);
 		rank(v, siqSusps, SIQSusp.class.getSimpleName(), sa.getSiqExp(), map);
 		rank(v, ra1Susps, RA1Susp.class.getSimpleName(), sa.getRaExp(), map);
+		rank(v, vwtSusps, VWTSusp.class.getSimpleName(), sa.getVwtExp(), map);
 	}
 
 	private void rank(Version v, List<AbstractSuspiciousness> susp, String fl,
@@ -202,10 +224,8 @@ public class ProjectAnalyzer {
 		StatementSum sum = map.get(susp.get(0).getLineNumber());
 		if (sum != null)
 			diagnosisContent
-					.append("MostSuspStatement:" + sum.getLineNumber())
-					.append(" ExecutionInfo:[a00=" + sum.getA00() + ",a10="
-							+ sum.getA10() + ",a01=" + sum.getA01() + ",a11="
-							+ sum.getA11() + "]").append("\n");
+					.append("MostSuspStatement:" + sum.getLineNumber()).append(" ")
+					.append(sum).append("\n");
 	}
 
 	public void getFaultLocation(String faultFile) {

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
 import sei.buaa.debug.entity.TestCase;
@@ -65,10 +64,10 @@ public class Parser {
 	}
 
 	public Map<Integer, StatementSum> parser(String gcovDir) {
-		
+
 		Timer timer = new Timer();
 		timer.start();
-		
+
 		File dir = new File(gcovDir);
 
 		if (dir.isDirectory()) {
@@ -79,7 +78,7 @@ public class Parser {
 		} else {
 			System.err.println(gcovDir + " is not a directory!");
 		}
-		
+
 		timer.end();
 		timer.timeElapse("analyzing gcov");
 
@@ -95,6 +94,8 @@ public class Parser {
 			totalFailedTestCaseCnt++;
 		else
 			totalPassedTestCaseCnt++;
+
+		TestCase testCase = new TestCase();
 
 		BufferedReader br = null;
 		FileReader fr = null;
@@ -122,6 +123,9 @@ public class Parser {
 					int times = Integer.parseInt(strs[0].trim());
 
 					Statement st = new Statement(lineNumber, times);
+					testCase.addStatement(st);
+					if (times != 0)
+						testCase.incrementExecutedStatements();
 					addStatementSum(st, passed == 1 ? false : true);
 				}
 				// read another line
@@ -138,8 +142,44 @@ public class Parser {
 				e.printStackTrace();
 			}
 		}
-		
-		
+
+		if (passed == 1) {
+			int totalELine = testCase.getTotalExecutedStatementCnt();
+			double wt = Math.log(totalExecutableCodeCnt) - Math.log(totalELine);
+			// System.out.println("totalELine="+totalELine);
+			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
+			// System.out.println(wt);
+			for (Statement st : testCase.getStatements()) {
+				StatementSum eSum = map.get(st.getLineNumber());
+				if (st.getCount() != 0) {
+					eSum.addToDA11(wt);
+				}
+				else
+				{
+					double wnf = Math.log(totalExecutableCodeCnt) - Math.log(totalExecutableCodeCnt-totalELine);
+					eSum.addToDA01(wnf);
+				}
+			}
+		}
+		else if (passed == 0) {
+			int totalELine = testCase.getTotalExecutedStatementCnt();
+			double wt = Math.log(totalExecutableCodeCnt) - Math.log(totalELine);
+			// System.out.println("totalELine="+totalELine);
+			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
+			// System.out.println(wt);
+			for (Statement st : testCase.getStatements()) {
+				StatementSum eSum = map.get(st.getLineNumber());
+				if (st.getCount() != 0) {
+					eSum.addToDA10(wt);
+				}
+				else
+				{
+					double wnp = Math.log(totalExecutableCodeCnt) - Math.log(totalExecutableCodeCnt-totalELine);
+					eSum.addToDA00(wnp);
+				}
+			}
+		}
+
 	}
 
 	private void addStatementSum(Statement s, boolean testCaseResult) {
