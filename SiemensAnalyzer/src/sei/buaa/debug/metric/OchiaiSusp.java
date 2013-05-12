@@ -16,5 +16,14 @@ public class OchiaiSusp extends AbstractSuspiciousness {
 			this.susp = a11/res;
 		}
 	}
+	
+	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
+		if (a10+a11 == 0)this.susp = 0;
+		else
+		{
+			double res = Math.sqrt((a11+a01)*(a11+a10)*1.0);
+			this.susp = a11/res;
+		}
+	}
 
 }

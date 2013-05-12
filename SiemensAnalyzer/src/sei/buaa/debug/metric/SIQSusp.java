@@ -18,6 +18,8 @@ public class SIQSusp extends AbstractSuspiciousness {
 		this.susp = (Ies*If*a11+Ins*Ip*a00)/(Ies*Ip*a10+Ins*If*a01);
 	}
 	
+	
+	
 	private double caclExecutedSIQ(int a00, int a01, int a10, int a11)
 	{
 		if (a10+a11 == 0)

@@ -16,8 +16,9 @@ public class Version {
 	private String name;
 	private int totalPassedCount;
 	private int totalFailedCount;
+	private double totalWeights = 0;
 	Set<Integer> faults = null;
-	private int examineEffort;
+	public int examineEffort;
 	private double expensive;
 	private String technique;
 
@@ -114,11 +115,16 @@ public class Version {
 	}
 
 	public String toString() {
-		return "[technique=" + technique + ",program=" + name + ",version="
-				+ versionId + ",totalPassedCount=" + totalPassedCount
-				+ ",totalFailedCoount=" + totalFailedCount + ",examineEffort="
+		return "[technique=" + technique + ",examineEffort="
 				+ examineEffort + ",expensive=" + examineEffort * 1.0
 				/ totalExecutableCode + "]";
+	}
+	
+	public String getVersionInfo()
+	{
+		return "[program=" + name + ",version="
+				+ versionId + ",totalPassedCount=" + totalPassedCount
+				+ ",totalFailedCount=" + totalFailedCount + "]";
 	}
 
 	public int getTotalExecutableCode() {
@@ -147,6 +153,21 @@ public class Version {
 
 	public void setTotalFailedCount(int totalFailedCount) {
 		this.totalFailedCount = totalFailedCount;
+	}
+
+
+	public double getTotalWeights() {
+		return totalWeights;
+	}
+
+
+	public void setTotalWeights(double totalWeights) {
+		this.totalWeights = totalWeights;
+	}
+
+
+	public int getExamineEffort() {
+		return examineEffort;
 	}
 
 }

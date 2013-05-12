@@ -13,12 +13,19 @@ public class StatementSum {
 	private double d_a01;
 	private double d_a00;
 	
+	private double d_aef = 0.0;
+	
 	
 	public StatementSum(int lineNumber)
 	{
 		this.lineNumber = lineNumber;
 	}
 	
+	
+	public void addToDAef(double w)
+	{
+		d_aef += w;
+	}
 	
 	public void addToDA00(double w)
 	{
@@ -124,5 +131,10 @@ public class StatementSum {
 
 	public void setD_a00(double d_a00) {
 		this.d_a00 = d_a00;
+	}
+
+
+	public double getD_aef() {
+		return d_aef;
 	}
 }

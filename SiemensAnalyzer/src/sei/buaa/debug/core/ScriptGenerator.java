@@ -188,7 +188,7 @@ public class ScriptGenerator {
 		*/
 		
 		
-		sb.append("\t\tgcov $programName.c\n");
+		sb.append("\t\tgcov -a $programName.c\n");
 
 		sb.append("\t\tdiff originalResult.txt currentResult.txt\n");
 		sb.append("\t\toracle=$?\n");

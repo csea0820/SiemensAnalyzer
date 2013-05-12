@@ -14,5 +14,11 @@ public class SBISusp extends AbstractSuspiciousness {
 		else
 		this.susp = a11*1.0/(a10+a11);
 	}
+	
+	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
+		if (a10+a11 == 0)this.susp = 0;
+		else
+		this.susp = a11*1.0/(a10+a11);
+	}
 
 }

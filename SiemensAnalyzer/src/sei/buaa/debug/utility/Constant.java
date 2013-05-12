@@ -23,14 +23,48 @@ public class Constant {
 	public static final String FAULTS_LIST = "/faults.txt";
 	
 	public static final String TARANTULA = "Tarantula";
+	public static final String WTARANTULA = "WTarantula";
+	public static final String LTARANTULA = "LTarantula";
+
+
 	public static final String JACCARD = "Jaccard";
+	public static final String WJACCARD = "WJaccard";
+	public static final String LJACCARD = "LJaccard";
+
+
 	public static final String OCHIAI = "Ochiai";
+	public static final String WOCHIAI = "WOchiai";
+	public static final String LOCHIAI = "LOchiai";
+
+
 	public static final String SBI = "SBI";
+	public static final String WSBI = "WSBI";
+	public static final String LSBI = "LSBI";
+
+
 	public static final String WONG = "Wong";
 	public static final String SIQ = "SIQ";
 	public static final String RA1 = "RA1";
 	public static final String VWT = "VWT";
+	
 	public static final String WONG2 = "Wong2";
+	public static final String WWONG2 = "WWong2";
+
+	public static final String AMPLE = "Ample";
+	public static final String WAMPLE = "WAmple";
+	public static final String LAMPLE = "LAmple";
+
+
+	public static final String OP = "Op";
+	public static final String WOP = "WOp";
+	public static final String LOP = "LOp";
+	
+	public static final String WONG3 = "Wong3";
+	public static final String WWONG3 = "WWong3";
+	public static final String LWONG3 = "LWong3";
+
+
+
 
 
 }

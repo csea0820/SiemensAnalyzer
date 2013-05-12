@@ -32,16 +32,18 @@ public class VWTSusp extends AbstractSuspiciousness {
 	
 	public void calcSups(int i_a00, int i_a01, int i_a10, int i_a11,double a00,double a01,double a10,double a11){
 		
-		double wtf = 0.0;
-		if (i_a11!= 0)
-			wtf = Math.log((i_a11+i_a10)*1.0/(i_a11)+1);
-		a11 *= wtf;
+//		double wtf = 0.0;
+//		if (i_a11!= 0)
+////			wtf = Math.log((i_a11+i_a10)*1.0/(i_a11)+1);
+//			wtf = (i_a11+i_a10)*1.0/(i_a11);
+//		a11 *= wtf;
 //		a11 = i_a11;
 		
-		double wnf = 0.0;
-		if (i_a01 != 0)
-			wnf = Math.log(a00*1.0/i_a01+2);
-		a01 *= wnf;
+//		double wnf = 0.0;
+//		if (i_a01 != 0)
+////			wnf = Math.log(i_a00*1.0/i_a01+2);
+//			wnf = i_a00*1.0/i_a01+1;
+//		a01 *= wnf;
 //		a01 = i_a01;
 		
 		
@@ -61,10 +63,19 @@ public class VWTSusp extends AbstractSuspiciousness {
 		
 //		System.out.println(lineNumber+":[a11="+i_a11+",d_a11="+a11+",a10="+i_a10+",d_a10="+a10+"]");
 		
+//		System.out.println("a11="+i_a11+",da11="+a11);
+//		if (a10+a11 == 0)this.susp = 0;
+//		else
+//		{
+//			double res = Math.sqrt((a11+a01)*(a11+a10)*1.0);
+//			this.susp = a11/res;
+//		}
 		
-		if (a10+a11 == 0)this.susp = 0;
-		else
-		this.susp = a11*1.0/(a10+a11);
+
+		this.susp = a11-a10-a01;
+		
+//		this.susp = a11/(i_a11)-1;
+
 	}
 
 }

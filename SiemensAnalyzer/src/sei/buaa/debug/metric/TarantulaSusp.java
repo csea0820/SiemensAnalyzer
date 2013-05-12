@@ -16,5 +16,14 @@ public class TarantulaSusp extends AbstractSuspiciousness {
 		else 
 		this.susp = a/(a+b);
 	}
+	
+	public void calcWeightedSups(double a00,double a01,double a10,double a11)
+	{
+		double a = a11*1.0/(a11+a01);
+		double b = a10*1.0/(a10+a00);
+		if (a+b == 0)this.susp = 0;
+		else 
+		this.susp = a/(a+b);
+	}
 
 }

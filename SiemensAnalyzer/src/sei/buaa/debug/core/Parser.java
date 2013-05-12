@@ -22,6 +22,7 @@ public class Parser {
 	private int totalFailedTestCaseCnt = 0;
 	private int totalPassedTestCaseCnt = 0;
 	private int totalExecutableCodeCnt = 0;
+	private double totalWeights = 0.0;
 	private Map<Integer, StatementSum> map = new HashMap<Integer, StatementSum>();
 
 	public List<TestCase> addCoincidentalCorrectnessInfo(List<TestCase> list,
@@ -80,7 +81,7 @@ public class Parser {
 		}
 
 		timer.end();
-		timer.timeElapse("analyzing gcov");
+//		timer.timeElapse("analyzing gcov");
 
 		return map;
 	}
@@ -107,22 +108,26 @@ public class Parser {
 			br = new BufferedReader(fr);
 
 			str = br.readLine();
+			Statement st = null;
 			while (str != null) {
 				if (str.charAt(8) == '#') {
 					str = str.replaceFirst("#####", "    0");
 				}
 
-				if (str.charAt(8) != '-' && str.charAt(9) == ':') {
+				if (str.length() > 16 && str.charAt(15) == '-' && str.substring(16, 21).equals("block")) {
+					st.setBlock(true);
+				} else if (str.charAt(8) != '-' && str.charAt(9) == ':') {
+
 					String[] strs = str.split(":");
-					totalExecutableCodeCnt++;
 					if (strs[2].trim().equals("{")) {
 						str = br.readLine();
 						continue;
 					}
+					totalExecutableCodeCnt++;
 					int lineNumber = Integer.parseInt(strs[1].trim());
 					int times = Integer.parseInt(strs[0].trim());
 
-					Statement st = new Statement(lineNumber, times);
+					st = new Statement(lineNumber, times);
 					testCase.addStatement(st);
 					if (times != 0)
 						testCase.incrementExecutedStatements();
@@ -143,27 +148,48 @@ public class Parser {
 			}
 		}
 
+		int totalBlockCnt = 0;
+		int totalCoverBlockCnt = 0;
+		
+		for (Statement st: testCase.getStatements())
+		{
+			if (st.isBlock())
+			{
+				totalBlockCnt++;
+				if (st.getCount() != 0)
+					totalCoverBlockCnt++;
+			}
+		}
+//		System.out.println("totalBlockCnt="+totalBlockCnt);
+//		System.out.println("totalCoverBlockCnt="+totalCoverBlockCnt);
+		
 		if (passed == 1) {
-			int totalELine = testCase.getTotalExecutedStatementCnt();
-			double wt = Math.log(totalExecutableCodeCnt) - Math.log(totalELine);
 			// System.out.println("totalELine="+totalELine);
 			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
 			// System.out.println(wt);
+//			double wt = Math.log(totalBlockCnt*1.0/totalCoverBlockCnt);
+//			double wnf = Math.log(totalBlockCnt*1.0/(totalBlockCnt - totalCoverBlockCnt));
+			
+			double wt = totalBlockCnt*1.0/totalCoverBlockCnt;
+			double wnf = totalBlockCnt*1.0/(totalBlockCnt - totalCoverBlockCnt+0.001);
+			
+			//weight proposed by Lee Naish
+			double wtt = 1.0/(totalCoverBlockCnt-1+0.0001);
+			totalWeights += wtt;
+			
+//			if (wt > 1.0)System.out.println(totalCoverBlockCnt+"/"+totalBlockCnt);
 			for (Statement st : testCase.getStatements()) {
+				
 				StatementSum eSum = map.get(st.getLineNumber());
 				if (st.getCount() != 0) {
 					eSum.addToDA11(wt);
-				}
-				else
-				{
-					double wnf = Math.log(totalExecutableCodeCnt) - Math.log(totalExecutableCodeCnt-totalELine);
+					eSum.addToDAef(wtt);					
+				} else {					
 					eSum.addToDA01(wnf);
 				}
-			}
-		}
-		else if (passed == 0) {
-			int totalELine = testCase.getTotalExecutedStatementCnt();
-			double wt = Math.log(totalExecutableCodeCnt) - Math.log(totalELine);
+			}		
+		} else if (passed == 0) {
+			double wt = Math.log(totalBlockCnt) - Math.log(totalCoverBlockCnt);
 			// System.out.println("totalELine="+totalELine);
 			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
 			// System.out.println(wt);
@@ -171,10 +197,9 @@ public class Parser {
 				StatementSum eSum = map.get(st.getLineNumber());
 				if (st.getCount() != 0) {
 					eSum.addToDA10(wt);
-				}
-				else
-				{
-					double wnp = Math.log(totalExecutableCodeCnt) - Math.log(totalExecutableCodeCnt-totalELine);
+				} else {
+					double wnp = Math.log(totalBlockCnt)
+							- Math.log(totalBlockCnt - totalCoverBlockCnt);
 					eSum.addToDA00(wnp);
 				}
 			}
@@ -218,6 +243,10 @@ public class Parser {
 
 	public int getTotalExecutableCodeCnt() {
 		return totalExecutableCodeCnt;
+	}
+
+	public double getTotalWeights() {
+		return totalWeights;
 	}
 
 }

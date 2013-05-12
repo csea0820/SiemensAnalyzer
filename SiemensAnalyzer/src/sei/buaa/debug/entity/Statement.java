@@ -4,12 +4,14 @@ public class Statement {
 	
 	private int lineNumber;
 	private int count;
+	private boolean block;
 	
 	public Statement(int lineNumber,int count)
 	{
 		this.lineNumber = lineNumber;
 		this.count = count;
 	}
+	
 	
 	public int getLineNumber() {
 		return lineNumber;
@@ -27,5 +29,15 @@ public class Statement {
 	public boolean isExecuted()
 	{
 		return count != 0;
+	}
+
+
+	public boolean isBlock() {
+		return block;
+	}
+
+
+	public void setBlock(boolean block) {
+		this.block = block;
 	}	
 }

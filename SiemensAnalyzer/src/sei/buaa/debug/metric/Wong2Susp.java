@@ -20,5 +20,9 @@ public class Wong2Susp extends AbstractSuspiciousness {
 	public void calcSups(int a00, int a01, int a10, int a11) {
 		this.susp = a11-a10;
 	}
+	
+	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
+		this.susp = a11-a10;
+	}
 
 }
