@@ -106,6 +106,7 @@ public class ProjectAnalyzer {
 			v.setName(programName);
 			v.setVersionId(vid);
 			v.addFaults(faults);
+			parser.setFaults(v.getFaults());
 			totalVersions++;
 //			System.out.println("version:"+vid);
 

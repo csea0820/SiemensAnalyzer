@@ -15,16 +15,24 @@ import sei.buaa.debug.entity.Statement;
 import sei.buaa.debug.entity.StatementSum;
 import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Timer;
+import sei.buaa.debug.utility.FileUtility;
 import sei.buaa.debug.utility.StringUtility;
 
 public class Parser {
 
+	private Set<Integer> faults = null;
 	private int totalFailedTestCaseCnt = 0;
 	private int totalPassedTestCaseCnt = 0;
 	private int totalExecutableCodeCnt = 0;
 	private double totalWeights = 0.0;
 	private Map<Integer, StatementSum> map = new HashMap<Integer, StatementSum>();
-
+	private boolean achieveCoincidentalCorrectness = false; //a flag indicates whether  CC info is obtained or not
+	
+	
+	private int totalCC = 0;
+	
+	private StringBuilder sb_CC = new StringBuilder();
+	
 	public List<TestCase> addCoincidentalCorrectnessInfo(List<TestCase> list,
 			String ccFilePath) {
 		Set<Integer> set = new HashSet<Integer>();
@@ -80,6 +88,17 @@ public class Parser {
 			System.err.println(gcovDir + " is not a directory!");
 		}
 
+		if (achieveCoincidentalCorrectness)
+		{
+			
+			String ccFileBasePath = gcovDir.substring(0,gcovDir.lastIndexOf("/")).replace("outputs", "coincidentalCorrectness");
+
+			File ccBaseDir = new File(ccFileBasePath);
+			if (ccBaseDir.exists() == false)
+				ccBaseDir.mkdir();
+			FileUtility.writeContentToFile(sb_CC.toString(), ccBaseDir+"/coincidentalCorrectness_"+StringUtility.getBaseName(gcovDir));
+		}
+		
 		timer.end();
 //		timer.timeElapse("analyzing gcov");
 
@@ -90,6 +109,7 @@ public class Parser {
 
 		String fileName = StringUtility.getBaseName(gcovFile);
 		int passed = StringUtility.getDigit(fileName, fileName.length() - 1);
+		int testCaseId = StringUtility.getDigit(fileName, fileName.length()-3);
 
 		if (passed == 1)
 			totalFailedTestCaseCnt++;
@@ -97,6 +117,8 @@ public class Parser {
 			totalPassedTestCaseCnt++;
 
 		TestCase testCase = new TestCase();
+		testCase.setPassed(passed == 1 ? false : true);
+		testCase.setId(testCaseId);
 
 		BufferedReader br = null;
 		FileReader fr = null;
@@ -131,7 +153,9 @@ public class Parser {
 					testCase.addStatement(st);
 					if (times != 0)
 						testCase.incrementExecutedStatements();
+					
 					addStatementSum(st, passed == 1 ? false : true);
+					
 				}
 				// read another line
 				str = br.readLine();
@@ -147,6 +171,9 @@ public class Parser {
 				e.printStackTrace();
 			}
 		}
+		
+		if (achieveCoincidentalCorrectness == true)
+			achieveCoincidentalCorrectness(testCase);
 
 		int totalBlockCnt = 0;
 		int totalCoverBlockCnt = 0;
@@ -207,7 +234,26 @@ public class Parser {
 
 	}
 
+	//if the testCase is CC, write this info into sb_CC
+	private void achieveCoincidentalCorrectness(TestCase testCase)
+	{
+		if (testCase.isPassed() == true)
+		{
+			for (Statement s:testCase.getStatements())
+			{
+				if (s.isExecuted() && faults.contains(s.getLineNumber()))
+				{
+					totalCC++;
+					sb_CC.append(testCase.getId()).append("\n");
+					break;
+				}
+			}
+		}
+	}
+	
 	private void addStatementSum(Statement s, boolean testCaseResult) {
+		
+		
 		StatementSum eSum = map.get(s.getLineNumber());
 		if (eSum == null) {
 			eSum = new StatementSum(s.getLineNumber());
@@ -224,7 +270,9 @@ public class Parser {
 
 	public static void main(String[] args) {
 		Parser parser = new Parser();
-		parser.parser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2");
+		parser.faults = new HashSet<Integer>();
+		parser.faults.add(215);
+		parser.parser("/Users/csea/Documents/Experiment/Siemens/tot_info/outputs/v23");
 		// parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_1797_0");
 		// parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_2002_1");
 	}
@@ -247,6 +295,10 @@ public class Parser {
 
 	public double getTotalWeights() {
 		return totalWeights;
+	}
+
+	public void setFaults(Set<Integer> faults) {
+		this.faults = faults;
 	}
 
 }

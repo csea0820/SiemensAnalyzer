@@ -170,4 +170,9 @@ public class Version {
 		return examineEffort;
 	}
 
+
+	public Set<Integer> getFaults() {
+		return faults;
+	}
+
 }
