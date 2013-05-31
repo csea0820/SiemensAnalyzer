@@ -207,7 +207,6 @@ public class ProjectAnalyzer {
 		
 		List<AbstractSuspiciousness> ra1Susps = new ArrayList<AbstractSuspiciousness>();
 		
-		List<AbstractSuspiciousness> vwtSusps = new ArrayList<AbstractSuspiciousness>();
 		
 		List<AbstractSuspiciousness> wong2Susps = new ArrayList<AbstractSuspiciousness>();
 		List<AbstractSuspiciousness> weightedWong2Susps = new ArrayList<AbstractSuspiciousness>();
@@ -413,6 +412,7 @@ public class ProjectAnalyzer {
 	{
 		AbstractSuspiciousness susp = new AbstractSuspiciousness(suspsCalc);
 		susp.calcSups(eSum);
+		susp.setLineNumber(eSum.getLineNumber());
 		list.add(susp);
 	}
 	
