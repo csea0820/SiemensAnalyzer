@@ -3,26 +3,18 @@
  */
 package sei.buaa.debug.metric;
 
+import sei.buaa.debug.entity.StatementSum;
+
 /**
  * @author csea
  *
  */
-public class Wong2Susp extends AbstractSuspiciousness {
+public class Wong2Susp implements ISuspsCalculator{
 
-	public Wong2Susp(int ln) {
-		super(ln);
-	}
-
-	/* (non-Javadoc)
-	 * @see sei.buaa.debug.metric.AbstractSuspiciousness#calcSups(int, int, int, int)
-	 */
-	@Override
-	public void calcSups(int a00, int a01, int a10, int a11) {
-		this.susp = a11-a10;
+	public double calcSups(StatementSum eSum) {
+		int a10 = eSum.getA10();
+		int a11 = eSum.getA11();
+		return (a11-a10)*1.0;
 	}
 	
-	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
-		this.susp = a11-a10;
-	}
-
 }

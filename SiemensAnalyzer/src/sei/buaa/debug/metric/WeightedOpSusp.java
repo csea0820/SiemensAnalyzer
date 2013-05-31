@@ -1,14 +1,21 @@
 package sei.buaa.debug.metric;
 
-public class WeightedOpSusp extends OpSusp {
+import sei.buaa.debug.entity.StatementSum;
 
-	public WeightedOpSusp(int ln) {
-		super(ln);
+public class WeightedOpSusp extends WeightedSusp implements ISuspsCalculator{
+
+
+	public double calcSups(StatementSum eSum) {
+		calcWeights(eSum.getA00(), eSum.getA01(), eSum.getA10(), eSum.getA11(),
+				eSum.getD_a00(), eSum.getD_a01(), eSum.getD_a10(),
+				eSum.getD_a11());
+		return calcWeightedSups(l_a00, l_a01, l_a10, l_a11);
 	}
 	
-	public void calcSups(int i_a00, int i_a01, int i_a10, int i_a11,double a00,double a01,double a10,double a11) {
-		calcWeights(i_a00, i_a01, i_a10, i_a11,a00,a01,a10,a11);
-		calcWeightedSups(d_a00, d_a01, d_a10, d_a11);
+	public double calcWeightedSups(double a00, double a01, double a10,
+			double a11) {
+		double b = a10*1.0/(a10+a00+1);
+		return a11-b;
 	}
 
 }

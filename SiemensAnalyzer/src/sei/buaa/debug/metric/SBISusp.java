@@ -1,24 +1,21 @@
 package sei.buaa.debug.metric;
 
+import sei.buaa.debug.entity.StatementSum;
 
-public class SBISusp extends AbstractSuspiciousness {
+public class SBISusp implements ISuspsCalculator {
 
-	public SBISusp(int ln) {
-		super(ln);
-		// TODO Auto-generated constructor stub
-	}
+	public double calcSups(StatementSum eSum) {
 
-	@Override
-	public void calcSups(int a00, int a01, int a10, int a11) {
-		if (a10+a11 == 0)this.susp = 0;
+		int a10 = eSum.getA10();
+		int a11 = eSum.getA11();
+		double susp = 0.0;
+		if (a10 + a11 == 0)
+			susp = 0;
 		else
-		this.susp = a11*1.0/(a10+a11);
+			susp = a11 * 1.0 / (a10 + a11);
+
+		return susp;
 	}
-	
-	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
-		if (a10+a11 == 0)this.susp = 0;
-		else
-		this.susp = a11*1.0/(a10+a11);
-	}
+
 
 }

@@ -42,8 +42,6 @@ public class SiemensAnalyzer {
 	
 	Expensive raExp = new Expensive(Constant.RA1);
 	
-	Expensive vwtExp = new Expensive(Constant.VWT);
-	
 	Expensive ampleExp = new Expensive(Constant.AMPLE);
 	Expensive lampleExp = new Expensive(Constant.LAMPLE);
 	Expensive wampleExp = new Expensive(Constant.WAMPLE);
@@ -124,9 +122,6 @@ public class SiemensAnalyzer {
 		
 		.append(String.format("%-10s", "RA")).append("\t")
 		
-		.append(String.format("%-10s", "VWT")).append("\t")
-
-		
 		.append(String.format("%-10s", "Ample")).append("\t")
 		.append(String.format("%-10s", "WAmple")).append("\t")
 		.append(String.format("%-10s", "LAmple")).append("\t")
@@ -169,8 +164,6 @@ public class SiemensAnalyzer {
 			.append(String.format("%-10d",siqExp.getIntervalNumber(a*0.01*interval))).append("\t")
 
 			.append(String.format("%-10d",raExp.getIntervalNumber(a*0.01*interval))).append("\t")
-
-			.append(String.format("%-10d",vwtExp.getIntervalNumber(a*0.01*interval))).append("\t")
 			
 			.append(String.format("%-10d",ampleExp.getIntervalNumber(a*0.01*interval))).append("\t")
 			.append(String.format("%-10d",wampleExp.getIntervalNumber(a*0.01*interval))).append("\t")
@@ -234,10 +227,6 @@ public class SiemensAnalyzer {
 
 	public Expensive getRaExp() {
 		return raExp;
-	}
-
-	public Expensive getVwtExp() {
-		return vwtExp;
 	}
 
 	public Expensive getWong2Exp() {

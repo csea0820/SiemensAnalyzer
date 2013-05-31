@@ -18,6 +18,7 @@ import sei.buaa.debug.entity.TestCase;
 import sei.buaa.debug.entity.Timer;
 import sei.buaa.debug.entity.Version;
 import sei.buaa.debug.metric.AmpleSusp;
+import sei.buaa.debug.metric.ISuspsCalculator;
 import sei.buaa.debug.metric.JaccardSusp;
 import sei.buaa.debug.metric.LeeAmpleSusp;
 import sei.buaa.debug.metric.LeeJaccardSusp;
@@ -33,7 +34,6 @@ import sei.buaa.debug.metric.SBISusp;
 import sei.buaa.debug.metric.SIQSusp;
 import sei.buaa.debug.metric.AbstractSuspiciousness;
 import sei.buaa.debug.metric.TarantulaSusp;
-import sei.buaa.debug.metric.VWTSusp;
 import sei.buaa.debug.metric.WeightedAmpleSusp;
 import sei.buaa.debug.metric.WeightedJaccardSusp;
 import sei.buaa.debug.metric.WeightedOchiaiSusp;
@@ -233,154 +233,52 @@ public class ProjectAnalyzer {
 //  		System.out.println(eSum);
 			
 			//Tarantula
-			TarantulaSusp s = new TarantulaSusp(eSum.getLineNumber());
-			s.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			tarantulaSusps.add(s);
+			addSuspToList(tarantulaSusps,new TarantulaSusp(),eSum);
+			addSuspToList(weightedTarantulaSusps,new WeightedTarantulSusp(),eSum);
+			addSuspToList(leeTarantulaSusps,new LeeTarantulaSusp(totalWeights),eSum);
 			
-			WeightedTarantulSusp w_s = new WeightedTarantulSusp(eSum.getLineNumber());
-			w_s.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedTarantulaSusps.add(w_s);
-					
-			LeeTarantulaSusp l_s = new LeeTarantulaSusp(eSum.getLineNumber());
-			l_s.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeTarantulaSusps.add(l_s);
-			
-
 			//Jaccard
-			JaccardSusp js = new JaccardSusp(eSum.getLineNumber());
-			js.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			jaccardSusps.add(js);
-			
-			WeightedJaccardSusp w_js = new WeightedJaccardSusp(eSum.getLineNumber());
-			w_js.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedJaccardSusps.add(w_js);
-			
-			LeeJaccardSusp l_js = new LeeJaccardSusp(eSum.getLineNumber());
-			l_js.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeJaccardSusps.add(l_js);
+			addSuspToList(jaccardSusps,new JaccardSusp(),eSum);
+			addSuspToList(weightedJaccardSusps,new WeightedJaccardSusp(),eSum);
+			addSuspToList(leeJaccardSusps,new LeeJaccardSusp(totalWeights),eSum);
 
 			//Ochiai
-			OchiaiSusp os = new OchiaiSusp(eSum.getLineNumber());
-			os.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			ochiaiSusps.add(os);
-			
-			WeightedOchiaiSusp w_os = new WeightedOchiaiSusp(eSum.getLineNumber());
-			w_os.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedOchiaiSusps.add(w_os);
-			
-			LeeOchiaiSusp l_os = new LeeOchiaiSusp(eSum.getLineNumber());
-			l_os.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeOchiaiSusps.add(l_os);
+			addSuspToList(ochiaiSusps,new OchiaiSusp(),eSum);
+			addSuspToList(weightedOchiaiSusps,new WeightedOchiaiSusp(),eSum);
+			addSuspToList(leeOchiaiSusps,new LeeOchiaiSusp(totalWeights),eSum);
 			
 			
 			//SBI
-			SBISusp sbi = new SBISusp(eSum.getLineNumber());
-			sbi.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			sbiSusps.add(sbi);
-			
-			WeightedSBISusp w_sbi = new WeightedSBISusp(eSum.getLineNumber());
-			w_sbi.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedSbiSusps.add(w_sbi);
-			
-			LeeSBISusp l_sbi = new LeeSBISusp(eSum.getLineNumber());
-			l_sbi.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeSbiSusps.add(l_sbi);
-			
+			addSuspToList(sbiSusps,new SBISusp(),eSum);
+			addSuspToList(weightedSbiSusps,new WeightedSBISusp(),eSum);
+			addSuspToList(leeSbiSusps,new LeeSBISusp(totalWeights),eSum);			
 			
 			//Wong
-			WongSusp wong = new WongSusp(eSum.getLineNumber());
-			wong.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			wongSusps.add(wong);
+			addSuspToList(wongSusps,new WongSusp(),eSum);
 			
 			//Wong2
-			Wong2Susp wong2 = new Wong2Susp(eSum.getLineNumber());
-			wong2.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			wong2Susps.add(wong2);
-			
-			WeightedWong2Susp w_wong2 = new WeightedWong2Susp(eSum.getLineNumber());
-			w_wong2.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedWong2Susps.add(w_wong2);
+			addSuspToList(wong2Susps,new Wong2Susp(),eSum);
+			addSuspToList(weightedWong2Susps,new WeightedWong2Susp(),eSum);
 			
 			//wong3
-			Wong3Susp wong3 = new Wong3Susp(eSum.getLineNumber());
-			wong3.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			wong3Susps.add(wong3);
-			
-			WeightedWong3Susp wwong3 = new WeightedWong3Susp(eSum.getLineNumber());
-			wwong3.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedWong3Susps.add(wwong3);
-			
-			LeeWong3Susp lwong3 = new LeeWong3Susp(eSum.getLineNumber());
-			lwong3.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeWong3Susps.add(lwong3);
+			addSuspToList(wong3Susps,new Wong3Susp(),eSum);
+			addSuspToList(weightedWong3Susps,new WeightedWong3Susp(),eSum);
+			addSuspToList(leeWong3Susps,new LeeWong3Susp(totalWeights),eSum);
 			
 			//SIQ
-			SIQSusp siq = new SIQSusp(eSum.getLineNumber());
-			siq.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			siqSusps.add(siq);
-			
+			addSuspToList(siqSusps,new SIQSusp(),eSum);
+	
 			//RA1
-			RA1Susp ra = new RA1Susp(eSum.getLineNumber());
-			ra.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			ra1Susps.add(ra);
-			
-			//VWT
-			VWTSusp vs = new VWTSusp(eSum.getLineNumber());
-			vs.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			vwtSusps.add(vs);
-			
+			addSuspToList(ra1Susps,new RA1Susp(),eSum);
+	
 			//Ample
-			AmpleSusp as = new AmpleSusp(eSum.getLineNumber());
-			as.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			ampleSusps.add(as);
-			
-			WeightedAmpleSusp w_as = new WeightedAmpleSusp(eSum.getLineNumber());
-			w_as.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedAmpleSusps.add(w_as);
-			
-			LeeAmpleSusp l_as = new LeeAmpleSusp(eSum.getLineNumber());
-			l_as.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeAmpleSusps.add(l_as);
-			
+			addSuspToList(ampleSusps,new AmpleSusp(),eSum);
+			addSuspToList(weightedAmpleSusps,new WeightedAmpleSusp(),eSum);
+			addSuspToList(leeAmpleSusps,new LeeAmpleSusp(totalWeights),eSum);				
 			//Op
-			OpSusp osp = new OpSusp(eSum.getLineNumber());
-			osp.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),
-					eSum.getA11());
-			opSusps.add(osp);
-			
-			WeightedOpSusp w_osp = new WeightedOpSusp(eSum.getLineNumber());
-			w_osp.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_a00(),eSum.getD_a01(),eSum.getD_a10(),eSum.getD_a11());
-			weightedOpSusps.add(w_osp);
-			
-			LeeOpSusp l_osp = new LeeOpSusp(eSum.getLineNumber());
-			l_osp.calcSups(eSum.getA00(), eSum.getA01(), eSum.getA10(),eSum.getA11(),
-					eSum.getD_aef(),totalWeights);
-			leeOpSusps.add(l_osp);
+			addSuspToList(opSusps,new OpSusp(),eSum);
+			addSuspToList(weightedOpSusps,new WeightedOpSusp(),eSum);
+			addSuspToList(leeOpSusps,new LeeOpSusp(totalWeights),eSum);			
 		}
 		
 		
@@ -438,8 +336,6 @@ public class ProjectAnalyzer {
 		rank(v, siqSusps, SIQSusp.class.getSimpleName(), sa.getSiqExp(), map);
 		
 		rank(v, ra1Susps, RA1Susp.class.getSimpleName(), sa.getRaExp(), map);
-		
-		rank(v, vwtSusps, VWTSusp.class.getSimpleName(), sa.getVwtExp(), map);
 		
 		rank(v, ampleSusps, AmpleSusp.class.getSimpleName(), sa.getAmpleExp(), map);
 		rank(v, weightedAmpleSusps, WeightedAmpleSusp.class.getSimpleName(), sa.getWeightedAmpleExp(), map);
@@ -513,6 +409,13 @@ public class ProjectAnalyzer {
 		// }
 	}
 
+	private void addSuspToList(List<AbstractSuspiciousness> list,ISuspsCalculator suspsCalc,StatementSum eSum)
+	{
+		AbstractSuspiciousness susp = new AbstractSuspiciousness(suspsCalc);
+		susp.calcSups(eSum);
+		list.add(susp);
+	}
+	
 	private void getVersionsInfo(String versionFile) {
 		BufferedReader bufferReader = null;
 		String str = null;

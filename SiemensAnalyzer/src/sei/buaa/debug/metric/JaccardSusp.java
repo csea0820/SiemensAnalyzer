@@ -1,19 +1,16 @@
 package sei.buaa.debug.metric;
 
+import sei.buaa.debug.entity.StatementSum;
 
-public class JaccardSusp extends AbstractSuspiciousness {
+public class JaccardSusp  implements ISuspsCalculator {
 
-	public JaccardSusp(int ln) {
-		super(ln);
+	public double calcSups(StatementSum eSum) {
+
+		int a01 = eSum.getA01();
+		int a10 = eSum.getA10();
+		int a11 = eSum.getA11();
+		return a11 * 1.0 / (a11 + a01 + a10);
 	}
 
-	@Override
-	public void calcSups(int a00, int a01, int a10, int a11) {
-		this.susp = a11*1.0/(a11+a01+a10);
-	}
-	
-	public void calcWeightedSups(double a00, double a01, double a10, double a11) {
-		this.susp = a11*1.0/(a11+a01+a10);
-	}
 
 }

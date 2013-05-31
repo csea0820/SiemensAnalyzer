@@ -1,7 +1,9 @@
 package sei.buaa.debug.metric;
 
+import sei.buaa.debug.entity.StatementSum;
 
-public class WongSusp extends AbstractSuspiciousness{
+
+public class WongSusp implements ISuspsCalculator{
 
 	int Nf,Ns;
 	int Nf1,Nf2,Nf3;
@@ -12,12 +14,12 @@ public class WongSusp extends AbstractSuspiciousness{
 	double alpha = 0.01;
 	double Xfs = 0.0;
 	
-	public WongSusp(int ln) {
-		super(ln);
-	}
 
-	@Override
-	public void calcSups(int a00, int a01, int a10, int a11) {
+	public double calcSups(StatementSum eSum) {
+		int a00 = eSum.getA00();
+		int a01 = eSum.getA01();
+		int a10 = eSum.getA10();
+		int a11 = eSum.getA11();
 		
 		Nf = a11;
 		Ns = a10;
@@ -45,7 +47,7 @@ public class WongSusp extends AbstractSuspiciousness{
 		
 		Xfs = (a01+11)*1.0/(a00+a10);
 		
-		this.susp = wf1*Nf1 + wf2*Nf2 + wf3*Nf3 - (ws1*Ns1 + ws2*Ns2 + alpha*Xfs*Ns3);
+		return wf1*Nf1 + wf2*Nf2 + wf3*Nf3 - (ws1*Ns1 + ws2*Ns2 + alpha*Xfs*Ns3);
 	}
 
 }

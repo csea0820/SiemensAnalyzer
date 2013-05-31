@@ -1,15 +1,31 @@
 package sei.buaa.debug.metric;
 
-public class LeeTarantulaSusp extends TarantulaSusp {
+import sei.buaa.debug.entity.StatementSum;
 
-	public LeeTarantulaSusp(int ln) {
-		super(ln);
+public class LeeTarantulaSusp extends WeightedSusp implements ISuspsCalculator{
+
+	double totalWeigth;
+	
+	public LeeTarantulaSusp(double totalWeight) {
+		this.totalWeigth = totalWeight;
 	}
 	
-	public void calcSups(int i_a00, int i_a01, int i_a10, int i_a11,double d_aef,double totalWeights) 
+	public double calcSups(StatementSum eSum) 
 	{
-		calcLeeWeights(i_a00, i_a01, i_a10, i_a11, d_aef, totalWeights);
-		calcWeightedSups(l_a00, l_a01, l_a10, l_a11);
+		calcLeeWeights(eSum.getA00(),eSum.getA01(),eSum.getA10(),eSum.getA11(),eSum.getD_aef(),totalWeigth);
+		return calcWeightedSups(l_a00, l_a01, l_a10, l_a11);
+	}
+	
+	public double calcWeightedSups(double a00, double a01, double a10,
+			double a11) {
+		double susp = 0;
+		double a = a11 * 1.0 / (a11 + a01);
+		double b = a10 * 1.0 / (a10 + a00);
+		if (a + b == 0)
+			susp = 0;
+		else
+			susp = a / (a + b);
+		return susp;
 	}
 
 }
