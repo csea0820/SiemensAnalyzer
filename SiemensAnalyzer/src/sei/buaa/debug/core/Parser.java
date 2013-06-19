@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,9 @@ public class Parser {
 	private int totalCC = 0;
 	
 	private StringBuilder sb_CC = new StringBuilder();
+	private String programDir;
+	String program = null;
+	int versionID;
 	
 	public List<TestCase> addCoincidentalCorrectnessInfo(List<TestCase> list,
 			String ccFilePath) {
@@ -105,8 +109,8 @@ public class Parser {
 		return map;
 	}
 
-	private void gcovParser(String gcovFile) {
-
+	private TestCase parseTestCase(String gcovFile)
+	{
 		String fileName = StringUtility.getBaseName(gcovFile);
 		int passed = StringUtility.getDigit(fileName, fileName.length() - 1);
 		int testCaseId = StringUtility.getDigit(fileName, fileName.length()-3);
@@ -172,6 +176,13 @@ public class Parser {
 			}
 		}
 		
+		return testCase;
+	}
+	
+	private void gcovParser(String gcovFile) {
+
+		TestCase testCase = parseTestCase(gcovFile);
+		
 		if (achieveCoincidentalCorrectness == true)
 			achieveCoincidentalCorrectness(testCase);
 
@@ -190,7 +201,7 @@ public class Parser {
 //		System.out.println("totalBlockCnt="+totalBlockCnt);
 //		System.out.println("totalCoverBlockCnt="+totalCoverBlockCnt);
 		
-		if (passed == 1) {
+		if (testCase.isPassed() == false) {
 			// System.out.println("totalELine="+totalELine);
 			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
 			// System.out.println(wt);
@@ -215,7 +226,7 @@ public class Parser {
 					eSum.addToDA01(wnf);
 				}
 			}		
-		} else if (passed == 0) {
+		} else {
 			double wt = Math.log(totalBlockCnt) - Math.log(totalCoverBlockCnt);
 			// System.out.println("totalELine="+totalELine);
 			// System.out.println("totalExecutableCodeCnt="+totalExecutableCodeCnt);
@@ -232,6 +243,63 @@ public class Parser {
 			}
 		}
 
+	}
+	
+	public void arffGenerator(String programDir)
+	{
+		this.programDir = programDir;
+		program = StringUtility.getBaseName(programDir);
+		File dir = new File(programDir+"/outputs");
+		
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			//System.out.println(versionID);
+			versionID = Integer.valueOf(file.getName().substring(1));
+			generator(file.getAbsolutePath());
+			
+		}
+	}
+	
+	public void generator(String programDir)
+	{		
+		File dir = new File(programDir);
+
+		List<TestCase> tcs = new ArrayList<TestCase>();
+		if (dir.isDirectory()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				TestCase tc = parseTestCase(file.getAbsolutePath());
+//				if (tc.isResult() == true)
+					tcs.add(tc);
+			}
+		} else {
+			System.err.println(programDir + " is not a directory!");
+		}
+		
+		generateArff(tcs);
+	}
+
+	private void generateArff(List<TestCase> tcs) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("@relation "+program+versionID+"\n");
+		
+		int attrCnt = totalExecutableCodeCnt;
+		
+		builder.append("@attribute ID integer\n");
+		for (int i = 0; i < attrCnt; i++)
+			builder.append("@attribute A"+i+" real\n");
+		
+		builder.append("@data\n");
+		for (int i = 0; i < tcs.size(); i++)
+		{
+			builder.append(tcs.get(i).getId());
+			for (int j = 0; j < tcs.get(i).getStatements().size(); j++)
+			{
+				builder.append(","+tcs.get(i).getStatements().get(j).getCount());
+			}
+			builder.append("\n");
+		}
+		FileUtility.writeContentToFile(builder.toString(),programDir+"/output_statement_arff/v"+versionID+".arff");
 	}
 
 	//if the testCase is CC, write this info into sb_CC
@@ -268,11 +336,29 @@ public class Parser {
 
 	}
 
+	
+	
 	public static void main(String[] args) {
-		Parser parser = new Parser();
-		parser.faults = new HashSet<Integer>();
-		parser.faults.add(215);
-		parser.parser("/Users/csea/Documents/Experiment/Siemens/tot_info/outputs/v23");
+		
+		if (args.length == 0)
+		{
+			System.out.println("Invalid Usage!");
+			System.out.println("Usage: ArffGenerator [programDir1 programDir2 ...]");
+		}
+		else 
+		{
+			for (String s: args)
+			{
+				System.out.println("Analyzing Program " + s);
+				new Parser().arffGenerator(s);
+			}
+		}
+		
+//		Parser parser = new Parser();
+//		parser.arffGenerator("/Users/csea/Documents/Experiment/Siemens/tot_info");
+		//parser.faults = new HashSet<Integer>();
+		//parser.faults.add(215);
+		//parser.parser("/Users/csea/Documents/Experiment/Siemens/tot_info/outputs/v23");
 		// parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_1797_0");
 		// parser.gcovParser("/Users/csea/Documents/Experiment/Siemens/schedule/outputs/v2/schedule.c.gcov_2002_1");
 	}
